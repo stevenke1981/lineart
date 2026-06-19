@@ -1,0 +1,21 @@
+{%- set lang = lang or 'zh' -%}
+{%- set c = char.components -%}
+{%- set o = char.outputs.color_scheme -%}
+###BASE###
+{{ char.base_style[lang] }}
+###HAIR###
+{{ c.hair.style[lang] }}
+髮色：黑色（墨黑），漸層灰色陰影
+###EYES###
+{{ c.face.eyes[lang] }}
+瞳色：留白處理，黑白對比
+###CLOTHING###
+{{ c.clothing.robe[lang] }}
+主色調：黑色線稿，灰色中間調，白色留白
+{{ c.clothing.collar[lang] }}：深灰陰影
+{{ c.clothing.waist[lang] }}：高對比黑色
+###ACCESSORIES###
+{% for acc in c.hair.accessories %}{{ acc[lang] }}：精細線條，留白高光
+{% endfor %}
+###OUTPUT###
+{{ o.style[lang] }}，黑白配色方案，灰階層次對比圖

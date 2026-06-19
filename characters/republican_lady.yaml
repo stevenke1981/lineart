@@ -1,0 +1,101 @@
+character:
+  id: republican_lady
+  label:
+    zh: 民國名媛
+    en: Republican Era Socialite
+
+  base_style:
+    zh: "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條"
+    en: "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines"
+
+  components:
+    face:
+      shape:
+        zh: 鵝蛋臉
+        en: oval face
+      eyes:
+        zh: 彎月眉眼
+        en: crescent-shaped eyes
+
+    expression:
+      type:
+        zh: 嫵媚
+        en: charming
+      mouth:
+        zh: 抿唇淺笑
+        en: subtle closed-lip smile
+
+    pose:
+      head_angle:
+        zh: 頭部30度側轉
+        en: 30 degree head turn
+      action:
+        zh: 手執團扇斜靠
+        en: leaning while holding a round fan
+
+    hair:
+      style:
+        zh: 手推波浪髮
+        en: finger wave hairstyle
+      accessories:
+        - zh: 珍珠髮夾
+          en: pearl hair clip
+        - zh: 流蘇耳墜
+          en: tassel earrings
+
+    clothing:
+      robe:
+        zh: 刺繡旗袍
+        en: embroidered qipao
+      collar:
+        zh: 立領盤扣
+        en: stand collar with frog buttons
+      waist:
+        zh: 側邊開衩
+        en: side slit
+
+  outputs:
+    three_view:
+      label:
+        zh: 人物三視圖
+        en: character three-view sheet
+      style:
+        zh: 動畫原畫設定書風格，民國風情畫集
+        en: animation keyframe setting book style, Republican era illustration collection
+    expressions:
+      label:
+        zh: 表情演變五連圖
+        en: five-panel expression evolution sheet
+      style:
+        zh: 動畫原畫設定書風格
+        en: animation keyframe setting book style
+      variants:
+        - id: charming
+          zh: 嫵媚
+          en: charming
+        - id: shy
+          zh: 嬌羞
+          en: shy
+        - id: teasing
+          zh: 挑逗
+          en: teasing
+        - id: sulky
+          zh: 賭氣
+          en: sulky
+        - id: delighted
+          zh: 欣喜
+          en: delighted
+    clothing_breakdown:
+      label:
+        zh: 服裝拆解圖
+        en: clothing breakdown diagram
+      style:
+        zh: 旗袍拆解圖，刺繡細節展示
+        en: qipao breakdown, embroidery detail showcase
+    hair_breakdown:
+      label:
+        zh: 髮飾拆解圖
+        en: hair accessory breakdown diagram
+      style:
+        zh: 民國髮型與飾品拆解圖
+        en: Republican era hairstyle and accessory breakdown

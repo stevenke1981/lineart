@@ -1,0 +1,101 @@
+character:
+  id: fantasy_elf
+  label:
+    zh: 森林精靈
+    en: Forest Elf
+
+  base_style:
+    zh: "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條"
+    en: "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines"
+
+  components:
+    face:
+      shape:
+        zh: 尖臉
+        en: pointed face
+      eyes:
+        zh: 細長精靈眼
+        en: slender elven eyes
+
+    expression:
+      type:
+        zh: 空靈
+        en: ethereal
+      mouth:
+        zh: 微笑不語
+        en: silent smile
+
+    pose:
+      head_angle:
+        zh: 頭部45度仰望
+        en: 45 degree upward gaze
+      action:
+        zh: 拉弓瞄準
+        en: drawing a bow
+
+    hair:
+      style:
+        zh: 及腰長髮
+        en: waist-length hair
+      accessories:
+        - zh: 藤蔓頭冠
+          en: vine crown
+        - zh: 精靈尖耳
+          en: pointed elven ears
+
+    clothing:
+      robe:
+        zh: 藤甲披風
+        en: vine armor cloak
+      collar:
+        zh: 樹葉領飾
+        en: leaf-shaped collar
+      waist:
+        zh: 藤蔓腰繩
+        en: vine waist cord
+
+  outputs:
+    three_view:
+      label:
+        zh: 人物三視圖
+        en: character three-view sheet
+      style:
+        zh: 動畫原畫設定書風格，奇幻角色設計圖集
+        en: animation keyframe setting book style, fantasy character design collection
+    expressions:
+      label:
+        zh: 表情演變五連圖
+        en: five-panel expression evolution sheet
+      style:
+        zh: 動畫原畫設定書風格
+        en: animation keyframe setting book style
+      variants:
+        - id: serene
+          zh: 寧靜
+          en: serene
+        - id: alert
+          zh: 警覺
+          en: alert
+        - id: sad
+          zh: 哀傷
+          en: sorrowful
+        - id: gentle
+          zh: 溫柔
+          en: gentle
+        - id: determined
+          zh: 堅毅
+          en: determined
+    clothing_breakdown:
+      label:
+        zh: 服裝拆解圖
+        en: clothing breakdown diagram
+      style:
+        zh: 服裝設計拆解圖，各層分解展示
+        en: clothing design breakdown, layered decomposition
+    hair_breakdown:
+      label:
+        zh: 髮飾拆解圖
+        en: hair accessory breakdown diagram
+      style:
+        zh: 飾品細節拆解圖
+        en: accessory detail breakdown

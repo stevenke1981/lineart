@@ -66,9 +66,13 @@ def main():
                     sys.exit(1)
                 char_data = load_character(args.character)
                 outputs = list_outputs(char_data)
+                char_outputs = char_data.get("outputs", {})
                 print(f"Output types for '{args.character}':")
                 for o in outputs:
-                    label = char_data["outputs"][o]["label"].get("zh", o)
+                    if o in char_outputs:
+                        label = char_outputs[o]["label"].get("zh", o)
+                    else:
+                        label = "(通用模板)"
                     print(f"  • {o}  ({label})")
                 print(f"\nLanguages: zh, en")
                 print(f"Models: sd, mj, nai")

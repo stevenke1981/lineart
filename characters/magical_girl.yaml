@@ -1,0 +1,101 @@
+character:
+  id: magical_girl
+  label:
+    zh: 魔法少女
+    en: Magical Girl
+
+  base_style:
+    zh: "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條"
+    en: "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines"
+
+  components:
+    face:
+      shape:
+        zh: 娃娃臉
+        en: doll-like face
+      eyes:
+        zh: 閃亮大眼
+        en: sparkling big eyes
+
+    expression:
+      type:
+        zh: 元氣
+        en: energetic
+      mouth:
+        zh: 燦爛笑容
+        en: bright smile
+
+    pose:
+      head_angle:
+        zh: 頭部微傾眨眼
+        en: slight head tilt winking
+      action:
+        zh: 魔法杖指向天空
+        en: pointing magic wand to the sky
+
+    hair:
+      style:
+        zh: 雙馬尾
+        en: twin tails
+      accessories:
+        - zh: 心形髮飾
+          en: heart-shaped hair ornament
+        - zh: 星星髮夾
+          en: star hair clip
+
+    clothing:
+      robe:
+        zh: 魔法戰鬥服
+        en: magical battle outfit
+      collar:
+        zh: 荷葉邊領
+        en: ruffled collar
+      waist:
+        zh: 大蝴蝶結腰帶
+        en: large ribbon waist belt
+
+  outputs:
+    three_view:
+      label:
+        zh: 人物三視圖
+        en: character three-view sheet
+      style:
+        zh: 動畫原畫設定書風格，魔法少女設計圖集
+        en: animation keyframe setting book style, magical girl design collection
+    expressions:
+      label:
+        zh: 表情演變五連圖
+        en: five-panel expression evolution sheet
+      style:
+        zh: 動畫原畫設定書風格
+        en: animation keyframe setting book style
+      variants:
+        - id: happy
+          zh: 開心
+          en: happy
+        - id: determined
+          zh: 決意
+          en: determined
+        - id: worried
+          zh: 擔心
+          en: worried
+        - id: crying
+          zh: 大哭
+          en: crying loudly
+        - id: surprised
+          zh: 驚訝
+          en: surprised
+    clothing_breakdown:
+      label:
+        zh: 服裝拆解圖
+        en: clothing breakdown diagram
+      style:
+        zh: 魔法少女服裝拆解圖，各層次展示
+        en: magical girl costume breakdown, layered showcase
+    hair_breakdown:
+      label:
+        zh: 髮飾拆解圖
+        en: hair accessory breakdown diagram
+      style:
+        zh: 可愛髮飾細節拆解圖
+        en: cute hair accessory detail breakdown

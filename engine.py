@@ -46,9 +46,20 @@ def load_character(char_id: str) -> dict:
         return yaml.safe_load(f)["character"]
 
 
+def list_templates() -> list[str]:
+    """Return available template names (from templates/ directory)."""
+    tmpls = []
+    for f in TEMPLATES_DIR.glob("*.j2"):
+        tmpls.append(f.stem)
+    return sorted(tmpls)
+
+
 def list_outputs(char_data: dict) -> list[str]:
-    """Return available output types for a character."""
-    return list(char_data.get("outputs", {}).keys())
+    """Return available output types for a character (defined + all templates)."""
+    defined = set(char_data.get("outputs", {}).keys())
+    available = set(list_templates())
+    # Merge: character-defined outputs + all available templates
+    return sorted(defined | available)
 
 
 # ── Template Engine ────────────────────────────────────────────────────
@@ -84,18 +95,27 @@ def generate_prompt(
     char_data = load_character(char_id)
 
     # 2. Validate output type
-    outputs = list_outputs(char_data)
-    if output_type not in outputs:
+    templates = list_templates()
+    if output_type not in templates:
         raise ValueError(
-            f"Output type '{output_type}' not found for '{char_id}'. "
-            f"Available: {', '.join(outputs)}"
+            f"Output type '{output_type}' not found. "
+            f"Available templates: {', '.join(templates)}"
         )
 
-    # 3. Render intermediate format
+    # 3. Ensure the output type exists in character data (fallback for new templates)
+    if "outputs" not in char_data:
+        char_data["outputs"] = {}
+    if output_type not in char_data["outputs"]:
+        char_data["outputs"][output_type] = {
+            "label": {"zh": output_type, "en": output_type},
+            "style": {"zh": "", "en": ""},
+        }
+
+    # 4. Render intermediate format
     template_name = f"{output_type}.j2"
     intermediate = render_template(template_name, char_data, lang=lang)
 
-    # 4. Adapt to model
+    # 5. Adapt to model
     adapter = get_adapter(model)
     prompt = adapter.format(intermediate, lang=lang)
 

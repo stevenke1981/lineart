@@ -1,0 +1,20 @@
+{%- set lang = lang or 'zh' -%}
+{%- set c = char.components -%}
+{%- set o = char.outputs.action_pose -%}
+###BASE###
+{{ char.base_style[lang] }}
+###FACE###
+{{ c.face.shape[lang] }}，{{ c.face.eyes[lang] }}
+###EXPRESSION###
+{{ c.expression.type[lang] }}，{{ c.expression.mouth[lang] }}
+###HAIR###
+{{ c.hair.style[lang] }}，{% for acc in c.hair.accessories %}{{ acc[lang] }}{% if not loop.last %}，{% endif %}{% endfor %}
+###CLOTHING###
+{{ c.clothing.robe[lang] }}，{{ c.clothing.collar[lang] }}，{{ c.clothing.waist[lang] }}
+###POSES###
+[POS1] {{ c.pose.action[lang] }}，{{ c.pose.head_angle[lang] }}
+[POS2] 跳躍動作，動態飄逸
+[POS3] 戰鬥姿勢，全身構圖
+[POS4] 角色比例圖，身高標示
+###OUTPUT###
+{{ o.style[lang] }}，人物動態姿勢集，角色比例指南

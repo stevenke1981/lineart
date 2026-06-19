@@ -16,14 +16,19 @@ def get_characters_meta():
     meta = []
     for cid in list_characters():
         data = load_character(cid)
-        outputs = list_outputs(data)
+        output_keys = list_outputs(data)
+        char_outputs = data.get("outputs", {})
         meta.append({
             "id": cid,
             "label_zh": data.get("label", {}).get("zh", cid),
             "label_en": data.get("label", {}).get("en", cid),
             "outputs": [
-                {"key": k, "zh": v.get("label", {}).get("zh", k), "en": v.get("label", {}).get("en", k)}
-                for k, v in data.get("outputs", {}).items()
+                {
+                    "key": k,
+                    "zh": char_outputs[k]["label"]["zh"] if k in char_outputs else k,
+                    "en": char_outputs[k]["label"]["en"] if k in char_outputs else k,
+                }
+                for k in output_keys
             ],
         })
     return meta

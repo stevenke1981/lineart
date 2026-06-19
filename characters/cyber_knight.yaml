@@ -1,0 +1,101 @@
+character:
+  id: cyber_knight
+  label:
+    zh: 賽博騎士
+    en: Cyber Knight
+
+  base_style:
+    zh: "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條"
+    en: "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines"
+
+  components:
+    face:
+      shape:
+        zh: 削瘦臉型
+        en: sharp chiseled face
+      eyes:
+        zh: 機械義眼
+        en: cybernetic eye implant
+
+    expression:
+      type:
+        zh: 冷酷
+        en: cold-blooded
+      mouth:
+        zh: 緊閉嘴唇
+        en: tight-closed lips
+
+    pose:
+      head_angle:
+        zh: 頭部微低俯視
+        en: slightly lowered head looking down
+      action:
+        zh: 手持能量劍站立
+        en: standing with energy sword in hand
+
+    hair:
+      style:
+        zh: 凌亂短髮
+        en: messy short hair
+      accessories:
+        - zh: 全息投影耳機
+          en: holographic headset
+        - zh: 面部奈米紋路
+          en: nano-circuit tattoos on face
+
+    clothing:
+      robe:
+        zh: 裝甲戰鬥服
+        en: armored combat suit
+      collar:
+        zh: 高領護頸
+        en: high neck guard
+      waist:
+        zh: 戰術腰帶
+        en: tactical belt
+
+  outputs:
+    three_view:
+      label:
+        zh: 人物三視圖
+        en: character three-view sheet
+      style:
+        zh: 動畫原畫設定書風格，機械設計圖集
+        en: animation keyframe setting book style, mecha design collection
+    expressions:
+      label:
+        zh: 表情演變五連圖
+        en: five-panel expression evolution sheet
+      style:
+        zh: 動畫原畫設定書風格
+        en: animation keyframe setting book style
+      variants:
+        - id: cold
+          zh: 冷酷
+          en: cold
+        - id: fierce
+          zh: 猙獰
+          en: fierce
+        - id: calm
+          zh: 沉著
+          en: calm
+        - id: angry
+          zh: 暴怒
+          en: enraged
+        - id: mocking
+          zh: 嘲諷
+          en: mocking
+    clothing_breakdown:
+      label:
+        zh: 裝甲拆解圖
+        en: armor breakdown diagram
+      style:
+        zh: 機械裝甲拆解圖，各部件分解展示
+        en: mechanical armor breakdown, component decomposition
+    hair_breakdown:
+      label:
+        zh: 裝備細節拆解圖
+        en: equipment detail breakdown
+      style:
+        zh: 賽博配件細節拆解圖
+        en: cybernetic accessory detail breakdown
