@@ -1,0 +1,17 @@
+{%- set lang = lang or 'zh' -%}
+{%- set c = char.components -%}
+{%- set o = char.outputs.clothing_breakdown -%}
+###BASE###
+{{ char.base_style[lang] }}
+###OUTER_ROBE###
+{{ c.clothing.robe[lang] }}
+###COLLAR###
+{{ c.clothing.collar[lang] }}
+###WAIST###
+{{ c.clothing.waist[lang] }}
+###BREAKDOWN_LAYERS###
+1. {{ c.clothing.robe[lang] }}
+2. {{ c.clothing.collar[lang] }}
+3. {{ c.clothing.waist[lang] }}
+###OUTPUT###
+{{ o.style[lang] }}，{{ o.label[lang] }}

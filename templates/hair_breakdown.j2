@@ -1,0 +1,15 @@
+{%- set lang = lang or 'zh' -%}
+{%- set c = char.components -%}
+{%- set o = char.outputs.hair_breakdown -%}
+###BASE###
+{{ char.base_style[lang] }}
+###HAIR_STYLE###
+{{ c.hair.style[lang] }}
+###ACCESSORIES###
+{% for acc in c.hair.accessories %}- {{ acc[lang] }}
+{% endfor %}
+###DETAILS###
+花朵髮飾：精細花瓣層次，纏絲工藝
+流蘇垂墜：串珠流蘇，金屬墜飾
+###OUTPUT###
+{{ o.style[lang] }}，{{ o.label[lang] }}

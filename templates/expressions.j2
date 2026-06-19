@@ -1,0 +1,16 @@
+{%- set lang = lang or 'zh' -%}
+{%- set c = char.components -%}
+{%- set o = char.outputs.expressions -%}
+###BASE###
+{{ char.base_style[lang] }}
+###FACE###
+{{ c.face.shape[lang] }}，{{ c.face.eyes[lang] }}
+###HAIR###
+{{ c.hair.style[lang] }}，{% for acc in c.hair.accessories %}{{ acc[lang] }}{% if not loop.last %}，{% endif %}{% endfor %}
+###CLOTHING###
+{{ c.clothing.robe[lang] }}，{{ c.clothing.collar[lang] }}，{{ c.clothing.waist[lang] }}
+###EXPRESSIONS###
+{% for v in o.variants %}[{{ v[lang] }}] {{ c.expression.type[lang] }}→{{ v[lang] }}，{{ c.pose.action[lang] }}
+{% endfor %}
+###OUTPUT###
+{{ o.style[lang] }}，{{ o.label[lang] }}

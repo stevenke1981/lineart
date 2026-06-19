@@ -1,0 +1,104 @@
+character:
+  id: court_lady
+  label:
+    zh: 古風宮廷少女
+    en: Ancient Court Lady
+
+  base_style:
+    zh: "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條"
+    en: "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines"
+
+  components:
+    face:
+      shape:
+        zh: 瓜子臉
+        en: oval face
+      eyes:
+        zh: 大眼睛
+        en: big eyes
+
+    expression:
+      type:
+        zh: 震驚
+        en: shocked
+      mouth:
+        zh: 嘴巴張開說出「你！」
+        en: 'mouth open saying "You!"'
+
+    pose:
+      head_angle:
+        zh: 頭部45度轉向
+        en: 45 degree head turn
+      action:
+        zh: 回頭動作
+        en: looking back over shoulder
+
+    hair:
+      style:
+        zh: 古代宮廷髮髻
+        en: ancient court hair bun
+      accessories:
+        - zh: 花朵髮飾
+          en: flower hair accessory
+        - zh: 流蘇垂墜
+          en: tassel pendant
+
+    clothing:
+      robe:
+        zh: 漢服刺繡外袍
+        en: hanfu embroidered robe
+      collar:
+        zh: 三層交領
+        en: three-layer cross collar
+      waist:
+        zh: 腰封蝴蝶結
+        en: waist bow
+
+  outputs:
+    three_view:
+      label:
+        zh: 人物三視圖
+        en: character three-view sheet
+      style:
+        zh: 動畫原畫設定書風格，漫畫角色設計圖集
+        en: animation keyframe setting book style, manga character design collection
+
+    expressions:
+      label:
+        zh: 表情演變五連圖
+        en: five-panel expression evolution sheet
+      style:
+        zh: 動畫原畫設定書風格
+        en: animation keyframe setting book style
+      variants:
+        - id: happy
+          zh: 開心
+          en: happy
+        - id: sad
+          zh: 悲傷
+          en: sad
+        - id: angry
+          zh: 憤怒
+          en: angry
+        - id: surprised
+          zh: 驚訝
+          en: surprised
+        - id: shy
+          zh: 害羞
+          en: shy
+
+    clothing_breakdown:
+      label:
+        zh: 服裝拆解圖
+        en: clothing breakdown diagram
+      style:
+        zh: 服裝設計拆解圖，各層分解展示
+        en: clothing design breakdown, layered decomposition
+
+    hair_breakdown:
+      label:
+        zh: 髮飾拆解圖
+        en: hair accessory breakdown diagram
+      style:
+        zh: 飾品細節拆解圖
+        en: accessory detail breakdown
