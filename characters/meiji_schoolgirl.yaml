@@ -1,0 +1,104 @@
+character:
+  id: meiji_schoolgirl
+  label:
+    zh: 明治女學生
+    en: Meiji Schoolgirl
+
+  base_style:
+    zh: "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條"
+    en: "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines"
+
+  components:
+    face:
+      shape:
+        zh: 圓臉
+        en: round face
+      eyes:
+        zh: 圓潤大眼
+        en: large round eyes
+
+    expression:
+      type:
+        zh: 好奇
+        en: curious
+      mouth:
+        zh: 微微張嘴微笑
+        en: slightly open mouth smiling
+
+    pose:
+      head_angle:
+        zh: 頭部15度歪頭
+        en: 15 degree head tilt
+      action:
+        zh: 雙手捧書站立
+        en: standing holding books in both hands
+
+    hair:
+      style:
+        zh: 明治束髮
+        en: Meiji tied hair
+      accessories:
+        - zh: 蝴蝶結緞帶
+          en: ribbon bow
+        - zh: 鬓邊小花
+          en: small flower on temple
+
+    clothing:
+      robe:
+        zh: 明治女學生制服
+        en: Meiji schoolgirl uniform
+      collar:
+        zh: 立領蕾絲
+        en: stand collar with lace
+      waist:
+        zh: 腰間蝴蝶結
+        en: waist ribbon bow
+
+  outputs:
+    three_view:
+      label:
+        zh: 人物三視圖
+        en: character three-view sheet
+      style:
+        zh: 動畫原畫設定書風格，漫畫角色設計圖集
+        en: animation keyframe setting book style, manga character design collection
+
+    expressions:
+      label:
+        zh: 表情演變五連圖
+        en: five-panel expression evolution sheet
+      style:
+        zh: 動畫原畫設定書風格
+        en: animation keyframe setting book style
+      variants:
+        - id: happy
+          zh: 開心
+          en: happy
+        - id: pout
+          zh: 嘟嘴
+          en: pout
+        - id: embarrassed
+          zh: 害羞
+          en: embarrassed
+        - id: crying
+          zh: 哭哭
+          en: crying
+        - id: excited
+          zh: 興奮
+          en: excited
+
+    clothing_breakdown:
+      label:
+        zh: 服裝拆解圖
+        en: clothing breakdown diagram
+      style:
+        zh: 服裝設計拆解圖，各層分解展示
+        en: clothing design breakdown, layered decomposition
+
+    hair_breakdown:
+      label:
+        zh: 髮飾拆解圖
+        en: hair accessory breakdown diagram
+      style:
+        zh: 飾品細節拆解圖
+        en: accessory detail breakdown

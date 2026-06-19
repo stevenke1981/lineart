@@ -1,0 +1,104 @@
+character:
+  id: sword_maiden
+  label:
+    zh: 仙俠劍姬
+    en: Xianxia Sword Maiden
+
+  base_style:
+    zh: "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條"
+    en: "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines"
+
+  components:
+    face:
+      shape:
+        zh: 鵝蛋臉
+        en: oval face
+      eyes:
+        zh: 丹鳳眼
+        en: phoenix eyes
+
+    expression:
+      type:
+        zh: 冷峻
+        en: cold and stern
+      mouth:
+        zh: 嘴角微揚冷笑
+        en: slight cold smirk
+
+    pose:
+      head_angle:
+        zh: 頭部30度微傾
+        en: 30 degree head tilt
+      action:
+        zh: 持劍側身站立
+        en: standing sideways holding a sword
+
+    hair:
+      style:
+        zh: 高馬尾長髮
+        en: high ponytail long hair
+      accessories:
+        - zh: 白玉髮簪
+          en: white jade hairpin
+        - zh: 髮帶飄逸
+          en: flowing hair ribbon
+
+    clothing:
+      robe:
+        zh: 雲紋廣袖長袍
+        en: cloud-pattern flowing robe
+      collar:
+        zh: 交領右衽
+        en: cross-collar right lapel
+      waist:
+        zh: 玉帶腰封
+        en: jade belt waistband
+
+  outputs:
+    three_view:
+      label:
+        zh: 人物三視圖
+        en: character three-view sheet
+      style:
+        zh: 動畫原畫設定書風格，漫畫角色設計圖集
+        en: animation keyframe setting book style, manga character design collection
+
+    expressions:
+      label:
+        zh: 表情演變五連圖
+        en: five-panel expression evolution sheet
+      style:
+        zh: 動畫原畫設定書風格
+        en: animation keyframe setting book style
+      variants:
+        - id: cold
+          zh: 冷峻
+          en: cold
+        - id: gentle
+          zh: 溫柔
+          en: gentle
+        - id: angry
+          zh: 怒視
+          en: angry glare
+        - id: surprised
+          zh: 驚訝
+          en: surprised
+        - id: smiling
+          zh: 淺笑
+          en: faint smile
+
+    clothing_breakdown:
+      label:
+        zh: 服裝拆解圖
+        en: clothing breakdown diagram
+      style:
+        zh: 服裝設計拆解圖，各層分解展示
+        en: clothing design breakdown, layered decomposition
+
+    hair_breakdown:
+      label:
+        zh: 髮飾拆解圖
+        en: hair accessory breakdown diagram
+      style:
+        zh: 飾品細節拆解圖
+        en: accessory detail breakdown
