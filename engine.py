@@ -58,8 +58,64 @@ def list_outputs(char_data: dict) -> list[str]:
     """Return available output types for a character (defined + all templates)."""
     defined = set(char_data.get("outputs", {}).keys())
     available = set(list_templates())
-    # Merge: character-defined outputs + all available templates
     return sorted(defined | available)
+
+
+# ── Custom Character Builder ───────────────────────────────────────────
+def build_custom_character(form: dict, lang: str = "zh") -> dict:
+    """Build a character dict from form fields (for custom character)."""
+    val = lambda key, fallback="": form.get(key, form.get(key, fallback))
+
+    def t(zh_val, en_val):
+        return {"zh": zh_val, "en": en_val}
+
+    char = {
+        "id": "custom",
+        "label": t(val("char_name", "自訂角色"), val("char_name_en", "Custom Character")),
+        "base_style": t(
+            "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條",
+            "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines"
+        ),
+        "components": {
+            "face": {
+                "shape": t(val("face_shape", "瓜子臉"), val("face_shape_en", "")),
+                "eyes": t(val("eyes", "大眼睛"), val("eyes_en", "")),
+            },
+            "expression": {
+                "type": t(val("expression", "震驚"), val("expression_en", "")),
+                "mouth": t(val("mouth", ""), val("mouth_en", "")),
+            },
+            "pose": {
+                "head_angle": t(val("head_angle", ""), val("head_angle_en", "")),
+                "action": t(val("action", ""), val("action_en", "")),
+            },
+            "hair": {
+                "style": t(val("hair_style", ""), val("hair_style_en", "")),
+                "accessories": _split_acc(val("hair_acc", ""), val("hair_acc_en", "")),
+            },
+            "clothing": {
+                "robe": t(val("robe", ""), val("robe_en", "")),
+                "collar": t(val("collar", ""), val("collar_en", "")),
+                "waist": t(val("waist", ""), val("waist_en", "")),
+            },
+        },
+        "outputs": {},
+    }
+    return char
+
+
+def _split_acc(zh_text: str, en_text: str) -> list[dict]:
+    """Split comma-separated accessories into bilingual list."""
+    zh_items = [x.strip() for x in zh_text.split(",") if x.strip()]
+    en_items = [x.strip() for x in en_text.split(",") if x.strip()]
+    max_len = max(len(zh_items), len(en_items), 1)
+    result = []
+    for i in range(max_len):
+        result.append({
+            "zh": zh_items[i] if i < len(zh_items) else "",
+            "en": en_items[i] if i < len(en_items) else "",
+        })
+    return result
 
 
 # ── Template Engine ────────────────────────────────────────────────────
@@ -85,14 +141,29 @@ def render_template(template_name: str, char_data: dict, lang: str = "zh") -> st
 
 # ── Assembly Pipeline ──────────────────────────────────────────────────
 def generate_prompt(
-    char_id: str,
     output_type: str,
     model: str = "sd",
     lang: str = "zh",
+    ar: str = "",
+    char_id: str = "",
+    char_data: Optional[dict] = None,
 ) -> str:
-    """Full pipeline: load → render → adapt → return."""
+    """Full pipeline: load → render → adapt → return.
+
+    Args:
+        output_type: Template name (e.g. 'three_view')
+        model: 'sd' | 'mj' | 'nai'
+        lang: 'zh' | 'en'
+        ar: Aspect ratio (e.g. '3:4', '16:9')
+        char_id: Load from YAML (used when char_data is None)
+        char_data: Direct character dict (skips YAML load)
+
+    Returns:
+        Assembled prompt string
+    """
     # 1. Load character
-    char_data = load_character(char_id)
+    if char_data is None:
+        char_data = load_character(char_id)
 
     # 2. Validate output type
     templates = list_templates()
@@ -102,7 +173,7 @@ def generate_prompt(
             f"Available templates: {', '.join(templates)}"
         )
 
-    # 3. Ensure the output type exists in character data (fallback for new templates)
+    # 3. Ensure output type entry exists
     if "outputs" not in char_data:
         char_data["outputs"] = {}
     if output_type not in char_data["outputs"]:
@@ -117,6 +188,31 @@ def generate_prompt(
 
     # 5. Adapt to model
     adapter = get_adapter(model)
-    prompt = adapter.format(intermediate, lang=lang)
+    prompt = adapter.format(intermediate, lang=lang, ar=ar)
 
     return prompt
+
+
+def generate_prompts(
+    output_types: list[str],
+    model: str = "sd",
+    lang: str = "zh",
+    ar: str = "",
+    char_id: str = "",
+    char_data: Optional[dict] = None,
+) -> dict[str, str]:
+    """Generate prompts for multiple output types at once.
+
+    Returns dict mapping output_type → prompt string.
+    """
+    results = {}
+    for ot in output_types:
+        results[ot] = generate_prompt(
+            output_type=ot,
+            model=model,
+            lang=lang,
+            ar=ar,
+            char_id=char_id,
+            char_data=char_data,
+        )
+    return results

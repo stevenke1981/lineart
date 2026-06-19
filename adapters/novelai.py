@@ -8,7 +8,7 @@ class NovelAIAdapter(BaseAdapter):
 
     QUALITY_TAGS = "best quality, amazing quality, very aesthetic, absurdres"
 
-    def format(self, intermediate: str, lang: str = "zh") -> str:
+    def format(self, intermediate: str, lang: str = "zh", ar: str = "") -> str:
         blocks = self._parse_blocks(intermediate)
         parts = []
 

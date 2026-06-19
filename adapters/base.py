@@ -7,7 +7,7 @@ class BaseAdapter(ABC):
     name: str = "base"
 
     @abstractmethod
-    def format(self, intermediate: str, lang: str = "zh") -> str:
+    def format(self, intermediate: str, lang: str = "zh", ar: str = "") -> str:
         """Convert intermediate format (###KEY### blocks) to model-specific prompt."""
         ...
 

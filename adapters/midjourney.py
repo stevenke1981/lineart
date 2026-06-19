@@ -6,9 +6,9 @@ class MidjourneyAdapter(BaseAdapter):
 
     name = "midjourney"
 
-    PARAMETERS = "--ar 3:4 --style raw --s 250 --v 6"
+    PARAMETERS = "--style raw --s 250 --v 6"
 
-    def format(self, intermediate: str, lang: str = "zh") -> str:
+    def format(self, intermediate: str, lang: str = "zh", ar: str = "") -> str:
         blocks = self._parse_blocks(intermediate)
 
         # MJ favours flowing natural language over tag-lists
@@ -26,4 +26,5 @@ class MidjourneyAdapter(BaseAdapter):
 
         prompt = ". ".join(sentences)
         prompt = self._normalize_punct(prompt, lang)
-        return f"{prompt} {self.PARAMETERS}"
+        ar_param = f" --ar {ar}" if ar else " --ar 3:4"
+        return f"{prompt} {self.PARAMETERS}{ar_param}"

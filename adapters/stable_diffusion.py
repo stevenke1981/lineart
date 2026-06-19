@@ -10,7 +10,7 @@ class StableDiffusionAdapter(BaseAdapter):
     WEIGHT_BOOST = {"BASE", "FACE", "EXPRESSION", "OUTPUT"}
     BOOST_WEIGHT = 1.3
 
-    def format(self, intermediate: str, lang: str = "zh") -> str:
+    def format(self, intermediate: str, lang: str = "zh", ar: str = "") -> str:
         blocks = self._parse_blocks(intermediate)
         parts = []
 
@@ -21,4 +21,7 @@ class StableDiffusionAdapter(BaseAdapter):
                 parts.append(value)
 
         result = ", ".join(parts)
-        return self._normalize_punct(result, lang)
+        result = self._normalize_punct(result, lang)
+        if ar:
+            result += f" --ar {ar}"
+        return result
