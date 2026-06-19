@@ -63,40 +63,79 @@ def list_outputs(char_data: dict) -> list[str]:
 
 # ── Custom Character Builder ───────────────────────────────────────────
 def build_custom_character(form: dict, lang: str = "zh") -> dict:
-    """Build a character dict from form fields (for custom character)."""
-    val = lambda key, fallback="": form.get(key, form.get(key, fallback))
+    """Build a character dict from form fields (for custom character).
 
-    def t(zh_val, en_val):
-        return {"zh": zh_val, "en": en_val}
+    Every field has a bilingual default — empty form input falls back to it.
+    """
+    # ── Defaults ──────────────────────────────────────────────────────
+    DEFAULTS = {
+        "char_name": ("自訂角色", "Custom Character"),
+        "char_name_en": ("自訂角色", "Custom Character"),
+        "face_shape": ("瓜子臉", "oval face"),
+        "face_shape_en": ("瓜子臉", "oval face"),
+        "eyes": ("大眼睛", "big eyes"),
+        "eyes_en": ("大眼睛", "big eyes"),
+        "expression": ("無表情", "neutral"),
+        "expression_en": ("無表情", "neutral"),
+        "mouth": ("閉唇", "closed lips"),
+        "mouth_en": ("閉唇", "closed lips"),
+        "head_angle": ("正面", "front facing"),
+        "head_angle_en": ("正面", "front facing"),
+        "action": ("站立", "standing"),
+        "action_en": ("站立", "standing"),
+        "hair_style": ("長髮", "long hair"),
+        "hair_style_en": ("長髮", "long hair"),
+        "hair_acc": ("", ""),
+        "hair_acc_en": ("", ""),
+        "robe": ("上衣", "top"),
+        "robe_en": ("上衣", "top"),
+        "collar": ("圓領", "round collar"),
+        "collar_en": ("圓領", "round collar"),
+        "waist": ("腰帶", "belt"),
+        "waist_en": ("腰帶", "belt"),
+    }
+
+    def val(key):
+        raw = form.get(key, "").strip()
+        if raw:
+            return raw
+        # Fall back to default
+        zh_def, en_def = DEFAULTS.get(key, ("", ""))
+        if key.endswith("_en"):
+            return en_def
+        return zh_def
+
+    def t(zh_key, en_key):
+        return {"zh": val(zh_key), "en": val(en_key)}
 
     char = {
         "id": "custom",
-        "label": t(val("char_name", "自訂角色"), val("char_name_en", "Custom Character")),
-        "base_style": t(
-            "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條",
-            "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines"
-        ),
+        "label": t("char_name", "char_name_en"),
+        "base_style": {
+            "zh": "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條",
+            "en": "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines",
+        },
         "components": {
             "face": {
-                "shape": t(val("face_shape", "瓜子臉"), val("face_shape_en", "")),
-                "eyes": t(val("eyes", "大眼睛"), val("eyes_en", "")),
+                "shape": t("face_shape", "face_shape_en"),
+                "eyes": t("eyes", "eyes_en"),
             },
             "expression": {
-                "type": t(val("expression", "震驚"), val("expression_en", "")),
-                "mouth": t(val("mouth", ""), val("mouth_en", "")),
+                "type": t("expression", "expression_en"),
+                "mouth": t("mouth", "mouth_en"),
             },
             "pose": {
-                "head_angle": t(val("head_angle", ""), val("head_angle_en", "")),
-                "action": t(val("action", ""), val("action_en", "")),
+                "head_angle": t("head_angle", "head_angle_en"),
+                "action": t("action", "action_en"),
             },
             "hair": {
-                "style": t(val("hair_style", ""), val("hair_style_en", "")),
-                "accessories": _split_acc(val("hair_acc", ""), val("hair_acc_en", "")),
+                "style": t("hair_style", "hair_style_en"),
+                "accessories": _split_acc(val("hair_acc"), val("hair_acc_en")),
             },
             "clothing": {
-                "robe": t(val("robe", ""), val("robe_en", "")),
-                "collar": t(val("collar", ""), val("collar_en", "")),
-                "waist": t(val("waist", ""), val("waist_en", "")),
+                "robe": t("robe", "robe_en"),
+                "collar": t("collar", "collar_en"),
+                "waist": t("waist", "waist_en"),
             },
         },
         "outputs": {},
