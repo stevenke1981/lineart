@@ -20,3 +20,7 @@ Thumbs.db
 
 # Brainstorm companion artifacts
 .superpowers/
+
+# OpenCode internal files
+.opencode/
+${PROJECT_ROOT}/.opencode/
