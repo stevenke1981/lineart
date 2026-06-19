@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lineart — 人物分鏡線稿提示詞生成器</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎨 Lineart</h1>
+      <p class="subtitle">人物分鏡線稿提示詞生成器</p>
+    </header>
+
+    <div class="card">
+      <form id="promptForm">
+        <div class="form-grid">
+          <div class="field">
+            <label for="character">角色</label>
+            <select id="character" name="character" required>
+              <option value="">— 選擇角色 —</option>
+              {% for c in characters %}
+              <option value="{{ c.id }}" data-label-zh="{{ c.label_zh }}" data-label-en="{{ c.label_en }}">
+                {{ c.label_zh }} / {{ c.label_en }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="output">輸出類型</label>
+            <select id="output" name="output" required disabled>
+              <option value="">— 先選角色 —</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="model">AI 模型</label>
+            <select id="model" name="model">
+              {% for m in models %}
+              <option value="{{ m.key }}">{{ m.label_zh }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="lang">語言</label>
+            <select id="lang" name="lang">
+              {% for l in langs %}
+              <option value="{{ l.key }}">{{ l.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-generate">✨ 產生提示詞</button>
+      </form>
+    </div>
+
+    <div id="result" class="card result-card" style="display:none;">
+      <div class="result-header">
+        <h2>📝 產生的提示詞</h2>
+        <div class="result-actions">
+          <button id="copyBtn" class="btn-copy" onclick="copyPrompt()">📋 複製</button>
+        </div>
+      </div>
+      <textarea id="promptOutput" readonly rows="8"></textarea>
+    </div>
+
+    <div id="error" class="card error-card" style="display:none;">
+      <p id="errorMsg"></p>
+    </div>
+
+    <div id="loading" class="card loading-card" style="display:none;">
+      <p>⏳ 正在產生提示詞...</p>
+    </div>
+  </div>
+
+  <script>
+    // ── Character → Output options ──
+    const outputsMap = {};
+    {% for c in characters %}
+    outputsMap["{{ c.id }}"] = [
+      {% for o in c.outputs %}
+      {key: "{{ o.key }}", zh: "{{ o.zh }}", en: "{{ o.en }}"},
+      {% endfor %}
+    ];
+    {% endfor %}
+
+    document.getElementById("character").addEventListener("change", function() {
+      const outputSel = document.getElementById("output");
+      const cid = this.value;
+      outputSel.innerHTML = "";
+
+      if (!cid || !outputsMap[cid]) {
+        outputSel.disabled = true;
+        outputSel.innerHTML = '<option value="">— 先選角色 —</option>';
+        return;
+      }
+
+      outputSel.disabled = false;
+      const lang = document.getElementById("lang").value;
+      outputSel.innerHTML = '<option value="">— 選擇輸出類型 —</option>';
+      outputsMap[cid].forEach(o => {
+        const opt = document.createElement("option");
+        opt.value = o.key;
+        opt.textContent = `${o.zh} / ${o.en}`;
+        outputSel.appendChild(opt);
+      });
+    });
+
+    // ── Language switch updates output labels ──
+    document.getElementById("lang").addEventListener("change", function() {
+      const cid = document.getElementById("character").value;
+      if (cid && outputsMap[cid]) {
+        const outputSel = document.getElementById("output");
+        const lang = this.value;
+        const selected = outputSel.value;
+        outputSel.innerHTML = '<option value="">— 選擇輸出類型 —</option>';
+        outputsMap[cid].forEach(o => {
+          const opt = document.createElement("option");
+          opt.value = o.key;
+          opt.textContent = lang === "zh" ? o.zh : o.en;
+          outputSel.appendChild(opt);
+        });
+        if (selected) outputSel.value = selected;
+      }
+    });
+
+    // ── Form Submit ──
+    document.getElementById("promptForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const resultDiv = document.getElementById("result");
+      const errorDiv = document.getElementById("error");
+      const loadingDiv = document.getElementById("loading");
+      const promptOut = document.getElementById("promptOutput");
+
+      resultDiv.style.display = "none";
+      errorDiv.style.display = "none";
+      loadingDiv.style.display = "block";
+
+      const formData = new FormData(this);
+
+      try {
+        const res = await fetch("/generate", { method: "POST", body: formData });
+        const data = await res.json();
+
+        loadingDiv.style.display = "none";
+
+        if (data.error) {
+          document.getElementById("errorMsg").textContent = "❌ " + data.error;
+          errorDiv.style.display = "block";
+          return;
+        }
+
+        promptOut.value = data.prompt;
+        resultDiv.style.display = "block";
+        promptOut.scrollIntoView({ behavior: "smooth" });
+      } catch (err) {
+        loadingDiv.style.display = "none";
+        document.getElementById("errorMsg").textContent = "❌ 網路錯誤：" + err.message;
+        errorDiv.style.display = "block";
+      }
+    });
+
+    // ── Copy ──
+    async function copyPrompt() {
+      const text = document.getElementById("promptOutput").value;
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        const btn = document.getElementById("copyBtn");
+        btn.textContent = "✅ 已複製";
+        setTimeout(() => { btn.textContent = "📋 複製"; }, 2000);
+      } catch {
+        // Fallback
+        const ta = document.getElementById("promptOutput");
+        ta.select();
+        document.execCommand("copy");
+      }
+    }
+  </script>
+</body>
+</html>
