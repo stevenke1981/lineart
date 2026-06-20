@@ -1,12 +1,11 @@
 """Core prompt assembly engine."""
 
-import os
+from pathlib import Path
+
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from pathlib import Path
-from typing import Optional
 
-from adapters import get_adapter, BaseAdapter
+from adapters import get_adapter
 
 # ── Paths ──────────────────────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).parent
@@ -21,7 +20,7 @@ def load_i18n(lang: str = "zh") -> dict:
     filepath = I18N_DIR / f"{lang}.yaml"
     if not filepath.exists():
         raise FileNotFoundError(f"Language file not found: {filepath}")
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
 
 
@@ -39,10 +38,9 @@ def load_character(char_id: str) -> dict:
     filepath = CHARACTERS_DIR / f"{char_id}.yaml"
     if not filepath.exists():
         raise FileNotFoundError(
-            f"Character '{char_id}' not found. "
-            f"Available: {', '.join(list_characters())}"
+            f"Character '{char_id}' not found. Available: {', '.join(list_characters())}"
         )
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         return yaml.safe_load(f)["character"]
 
 
@@ -68,7 +66,7 @@ def build_custom_character(form: dict, lang: str = "zh") -> dict:
     Every field has a bilingual default — empty form input falls back to it.
     """
     # ── Defaults ──────────────────────────────────────────────────────
-    DEFAULTS = {
+    defaults = {
         "char_name": ("自訂角色", "Custom Character"),
         "char_name_en": ("自訂角色", "Custom Character"),
         "face_shape": ("瓜子臉", "oval face"),
@@ -100,7 +98,7 @@ def build_custom_character(form: dict, lang: str = "zh") -> dict:
         if raw:
             return raw
         # Fall back to default
-        zh_def, en_def = DEFAULTS.get(key, ("", ""))
+        zh_def, en_def = defaults.get(key, ("", ""))
         if key.endswith("_en"):
             return en_def
         return zh_def
@@ -113,7 +111,10 @@ def build_custom_character(form: dict, lang: str = "zh") -> dict:
         "label": t("char_name", "char_name_en"),
         "base_style": {
             "zh": "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條",
-            "en": "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines",
+            "en": (
+                "anime character design sheet, black and white ink, "
+                "clean lineart, white background, ultra-fine lines"
+            ),
         },
         "components": {
             "face": {
@@ -150,15 +151,17 @@ def _split_acc(zh_text: str, en_text: str) -> list[dict]:
     max_len = max(len(zh_items), len(en_items), 1)
     result = []
     for i in range(max_len):
-        result.append({
-            "zh": zh_items[i] if i < len(zh_items) else "",
-            "en": en_items[i] if i < len(en_items) else "",
-        })
+        result.append(
+            {
+                "zh": zh_items[i] if i < len(zh_items) else "",
+                "en": en_items[i] if i < len(en_items) else "",
+            }
+        )
     return result
 
 
 # ── Template Engine ────────────────────────────────────────────────────
-_jinja_env: Optional[Environment] = None
+_jinja_env: Environment | None = None
 
 
 def _get_env() -> Environment:
@@ -185,7 +188,7 @@ def generate_prompt(
     lang: str = "zh",
     ar: str = "",
     char_id: str = "",
-    char_data: Optional[dict] = None,
+    char_data: dict | None = None,
 ) -> str:
     """Full pipeline: load → render → adapt → return.
 
@@ -208,8 +211,7 @@ def generate_prompt(
     templates = list_templates()
     if output_type not in templates:
         raise ValueError(
-            f"Output type '{output_type}' not found. "
-            f"Available templates: {', '.join(templates)}"
+            f"Output type '{output_type}' not found. Available templates: {', '.join(templates)}"
         )
 
     # 3. Ensure output type entry exists
@@ -238,7 +240,7 @@ def generate_prompts(
     lang: str = "zh",
     ar: str = "",
     char_id: str = "",
-    char_data: Optional[dict] = None,
+    char_data: dict | None = None,
 ) -> dict[str, str]:
     """Generate prompts for multiple output types at once.
 

@@ -1,17 +1,16 @@
 """Command-line interface for Lineart prompt generator."""
 
 import argparse
-import json
 import sys
 
 from engine import (
+    build_custom_character,
     generate_prompt,
     generate_prompts,
-    build_custom_character,
     list_characters,
+    list_outputs,
     list_templates,
     load_character,
-    list_outputs,
 )
 
 AR_PRESETS = ["3:4", "1:1", "4:3", "16:9", "9:16", "21:9", "9:21"]
@@ -26,21 +25,29 @@ def main():
 
     # ── generate ──────────────────────────────────────────────────────
     gen = sub.add_parser("generate", help="Generate prompt(s)")
-    gen.add_argument("character", nargs="?", default="",
-                     help="Character ID (omit for --custom)")
-    gen.add_argument("--type", "-t", default="",
-                     help="Output type(s), comma-separated (e.g. three_view,expressions)")
-    gen.add_argument("--model", "-m", default="sd",
-                     choices=["sd", "stable_diffusion", "mj", "midjourney",
-                              "nai", "novelai"],
-                     help="Target AI model (default: sd)")
-    gen.add_argument("--lang", "-l", default="zh", choices=["zh", "en"],
-                     help="Output language (default: zh)")
-    gen.add_argument("--ar", default="",
-                     choices=AR_PRESETS + [""],
-                     help="Aspect ratio (e.g. 3:4, 16:9)")
-    gen.add_argument("--custom", action="store_true",
-                     help="Enable custom character mode (pass fields below)")
+    gen.add_argument("character", nargs="?", default="", help="Character ID (omit for --custom)")
+    gen.add_argument(
+        "--type",
+        "-t",
+        default="",
+        help="Output type(s), comma-separated (e.g. three_view,expressions)",
+    )
+    gen.add_argument(
+        "--model",
+        "-m",
+        default="sd",
+        choices=["sd", "stable_diffusion", "mj", "midjourney", "nai", "novelai"],
+        help="Target AI model (default: sd)",
+    )
+    gen.add_argument(
+        "--lang", "-l", default="zh", choices=["zh", "en"], help="Output language (default: zh)"
+    )
+    gen.add_argument(
+        "--ar", default="", choices=AR_PRESETS + [""], help="Aspect ratio (e.g. 3:4, 16:9)"
+    )
+    gen.add_argument(
+        "--custom", action="store_true", help="Enable custom character mode (pass fields below)"
+    )
     gen.add_argument("--name", help="Custom character name (zh)")
     gen.add_argument("--name-en", help="Custom character name (en)")
     gen.add_argument("--face", help="Face shape (zh)")
@@ -68,9 +75,13 @@ def main():
 
     # ── list ──────────────────────────────────────────────────────────
     lst = sub.add_parser("list", help="List available resources")
-    lst.add_argument("target", nargs="?", choices=["characters", "outputs", "templates"],
-                     default="characters",
-                     help="What to list (default: characters)")
+    lst.add_argument(
+        "target",
+        nargs="?",
+        choices=["characters", "outputs", "templates"],
+        default="characters",
+        help="What to list (default: characters)",
+    )
     lst.add_argument("--character", "-c", help="Character ID (required for 'outputs')")
 
     args = parser.parse_args()
@@ -80,32 +91,34 @@ def main():
         if args.command == "generate":
             # Build character data
             if args.custom:
-                char_data = build_custom_character({
-                    "char_name": args.name or "",
-                    "char_name_en": args.name_en or "",
-                    "face_shape": args.face or "",
-                    "face_shape_en": args.face_en or "",
-                    "eyes": args.eyes or "",
-                    "eyes_en": args.eyes_en or "",
-                    "expression": args.expression or "",
-                    "expression_en": args.expression_en or "",
-                    "mouth": args.mouth or "",
-                    "mouth_en": args.mouth_en or "",
-                    "head_angle": args.head_angle or "",
-                    "head_angle_en": args.head_angle_en or "",
-                    "action": args.action or "",
-                    "action_en": args.action_en or "",
-                    "hair_style": args.hair or "",
-                    "hair_style_en": args.hair_en or "",
-                    "hair_acc": args.hair_acc or "",
-                    "hair_acc_en": args.hair_acc_en or "",
-                    "robe": args.robe or "",
-                    "robe_en": args.robe_en or "",
-                    "collar": args.collar or "",
-                    "collar_en": args.collar_en or "",
-                    "waist": args.waist or "",
-                    "waist_en": args.waist_en or "",
-                })
+                char_data = build_custom_character(
+                    {
+                        "char_name": args.name or "",
+                        "char_name_en": args.name_en or "",
+                        "face_shape": args.face or "",
+                        "face_shape_en": args.face_en or "",
+                        "eyes": args.eyes or "",
+                        "eyes_en": args.eyes_en or "",
+                        "expression": args.expression or "",
+                        "expression_en": args.expression_en or "",
+                        "mouth": args.mouth or "",
+                        "mouth_en": args.mouth_en or "",
+                        "head_angle": args.head_angle or "",
+                        "head_angle_en": args.head_angle_en or "",
+                        "action": args.action or "",
+                        "action_en": args.action_en or "",
+                        "hair_style": args.hair or "",
+                        "hair_style_en": args.hair_en or "",
+                        "hair_acc": args.hair_acc or "",
+                        "hair_acc_en": args.hair_acc_en or "",
+                        "robe": args.robe or "",
+                        "robe_en": args.robe_en or "",
+                        "collar": args.collar or "",
+                        "collar_en": args.collar_en or "",
+                        "waist": args.waist or "",
+                        "waist_en": args.waist_en or "",
+                    }
+                )
                 char_id = ""
             else:
                 if not args.character:
@@ -153,8 +166,8 @@ def main():
                 print("Available characters:")
                 for c in chars:
                     print(f"  • {c}")
-                print(f"\nUse: python cli.py generate <character> <output(s)>")
-                print(f"     python cli.py generate --custom ...")
+                print("\nUse: python cli.py generate <character> <output(s)>")
+                print("     python cli.py generate --custom ...")
 
             elif args.target == "templates":
                 tmpls = list_templates()
@@ -176,8 +189,8 @@ def main():
                     else:
                         label = "(通用模板)"
                     print(f"  • {o}  ({label})")
-                print(f"\nLanguages: zh, en")
-                print(f"Models: sd, mj, nai")
+                print("\nLanguages: zh, en")
+                print("Models: sd, mj, nai")
                 print(f"Aspect ratios: {', '.join(AR_PRESETS)}")
 
     except Exception as e:

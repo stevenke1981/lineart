@@ -7,21 +7,26 @@ Features:
 - Bilingual (zh/en) support
 """
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, jsonify, render_template, request
+
 from engine import (
+    build_custom_character,
     generate_prompt,
     generate_prompts,
-    build_custom_character,
     list_characters,
+    list_outputs,
     list_templates,
     load_character,
-    list_outputs,
 )
 
 app = Flask(__name__)
 
 AR_PRESETS = [
-    {"key": "3:4", "label_zh": "直式 3:4（角色設定稿）", "label_en": "Portrait 3:4 (character sheet)"},
+    {
+        "key": "3:4",
+        "label_zh": "直式 3:4（角色設定稿）",
+        "label_en": "Portrait 3:4 (character sheet)",
+    },
     {"key": "1:1", "label_zh": "方形 1:1（頭像構圖）", "label_en": "Square 1:1 (portrait)"},
     {"key": "4:3", "label_zh": "橫式 4:3（半身構圖）", "label_en": "Landscape 4:3 (half body)"},
     {"key": "16:9", "label_zh": "寬螢幕 16:9（場景構圖）", "label_en": "Widescreen 16:9 (scene)"},
@@ -48,19 +53,21 @@ def get_characters_meta():
         data = load_character(cid)
         output_keys = list_outputs(data)
         char_outputs = data.get("outputs", {})
-        meta.append({
-            "id": cid,
-            "label_zh": data.get("label", {}).get("zh", cid),
-            "label_en": data.get("label", {}).get("en", cid),
-            "outputs": [
-                {
-                    "key": k,
-                    "zh": char_outputs[k]["label"]["zh"] if k in char_outputs else k,
-                    "en": char_outputs[k]["label"]["en"] if k in char_outputs else k,
-                }
-                for k in output_keys
-            ],
-        })
+        meta.append(
+            {
+                "id": cid,
+                "label_zh": data.get("label", {}).get("zh", cid),
+                "label_en": data.get("label", {}).get("en", cid),
+                "outputs": [
+                    {
+                        "key": k,
+                        "zh": char_outputs[k]["label"]["zh"] if k in char_outputs else k,
+                        "en": char_outputs[k]["label"]["en"] if k in char_outputs else k,
+                    }
+                    for k in output_keys
+                ],
+            }
+        )
     return meta
 
 
@@ -68,7 +75,7 @@ def get_all_templates_meta():
     """Return list of {key, zh, en} for all templates."""
     tmpls = list_templates()
     # Friendly names for templates
-    NAMES = {
+    names = {
         "three_view": ("人物三視圖", "Three-view Sheet"),
         "expressions": ("表情演變五連圖", "Expression Evolution"),
         "clothing_breakdown": ("服裝拆解圖", "Clothing Breakdown"),
@@ -78,24 +85,24 @@ def get_all_templates_meta():
         "color_scheme": ("配色方案", "Color Scheme"),
         "weapon_prop": ("武器道具拆解", "Weapon/Prop Breakdown"),
     }
-    return [
-        {"key": t, "zh": NAMES.get(t, (t, t))[0], "en": NAMES.get(t, (t, t))[1]}
-        for t in tmpls
-    ]
+    return [{"key": t, "zh": names.get(t, (t, t))[0], "en": names.get(t, (t, t))[1]} for t in tmpls]
 
 
 # ── Routes ────────────────────────────────────────────────────────────
+
 
 @app.route("/")
 def index():
     chars = get_characters_meta()
     templates = get_all_templates_meta()
-    return render_template("index.html",
-                           characters=chars,
-                           templates=templates,
-                           models=MODELS,
-                           langs=LANGS,
-                           ar_presets=AR_PRESETS)
+    return render_template(
+        "index.html",
+        characters=chars,
+        templates=templates,
+        models=MODELS,
+        langs=LANGS,
+        ar_presets=AR_PRESETS,
+    )
 
 
 @app.route("/generate", methods=["POST"])
@@ -164,8 +171,13 @@ def api_outputs(char_id):
         result = []
         for k in outputs:
             if k in char_outputs:
-                result.append({"key": k, "zh": char_outputs[k]["label"]["zh"],
-                               "en": char_outputs[k]["label"]["en"]})
+                result.append(
+                    {
+                        "key": k,
+                        "zh": char_outputs[k]["label"]["zh"],
+                        "en": char_outputs[k]["label"]["en"],
+                    }
+                )
             else:
                 result.append({"key": k, "zh": k, "en": k})
         return jsonify(result)

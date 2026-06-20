@@ -24,3 +24,8 @@ Thumbs.db
 # OpenCode internal files
 .opencode/
 ${PROJECT_ROOT}/.opencode/
+
+# Test artifacts
+.pytest_cache/
+htmlcov/
+.coverage*
