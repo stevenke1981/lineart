@@ -1,6 +1,7 @@
 {%- set lang = lang or 'zh' -%}
 {%- set c = char.components -%}
 {%- set o = char.outputs.action_pose -%}
+{%- set t = i18n.templates.action_pose -%}
 ###BASE###
 {{ char.base_style[lang] }}
 ###FACE###
@@ -13,8 +14,8 @@
 {{ c.clothing.robe[lang] }}，{{ c.clothing.collar[lang] }}，{{ c.clothing.waist[lang] }}
 ###POSES###
 [POS1] {{ c.pose.action[lang] }}，{{ c.pose.head_angle[lang] }}
-[POS2] 跳躍動作，動態飄逸
-[POS3] 戰鬥姿勢，全身構圖
-[POS4] 角色比例圖，身高標示
+[POS2] {{ t.pos2_desc }}
+[POS3] {{ t.pos3_desc }}
+[POS4] {{ t.pos4_desc }}
 ###OUTPUT###
-{{ o.style[lang] }}，人物動態姿勢集，角色比例指南
+{{ o.style[lang] }}，{{ t.output_label }}

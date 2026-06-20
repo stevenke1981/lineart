@@ -1,19 +1,20 @@
 {%- set lang = lang or 'zh' -%}
 {%- set c = char.components -%}
 {%- set o = char.outputs.weapon_prop -%}
+{%- set t = i18n.templates.weapon_prop -%}
 ###BASE###
 {{ char.base_style[lang] }}
 ###CHARACTER_CARRYING###
 {{ c.clothing.robe[lang] }}，{{ c.pose.action[lang] }}
 ###PROP_MAIN###
-手持道具設計拆解圖
-主體結構：三視圖展示（正面/側面/俯視）
+{{ t.main_title }}
+{{ t.main_desc }}
 ###PROP_DETAILS###
-細節A：握柄/裝飾處放大特寫
-細節B：紋路/花紋細部描寫
+{{ t.detail_a }}
+{{ t.detail_b }}
 ###PROP_BREAKDOWN###
-部件1：主體外形
-部件2：裝飾配件
-部件3：連接結構
+{{ t.part_1 }}
+{{ t.part_2 }}
+{{ t.part_3 }}
 ###OUTPUT###
-{{ o.style[lang] }}，道具設計拆解圖
+{{ o.style[lang] }}，{{ t.output_label }}

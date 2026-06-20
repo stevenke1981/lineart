@@ -12,3 +12,41 @@ terms:
   front_view: 正面
   side_view: 側面
   back_view: 背面
+
+templates:
+  chibi_version:
+    style: "Q版化，二頭身比例，頭大身小，可愛風格"
+    face_zoom: "（放大）"
+    cheek: "圓潤臉頰"
+    hair_simplified: "（簡化）"
+    clothing_simplified: "（簡化版）"
+    poses:
+      front: "Q版站立，大眼睛"
+      side: "Q版側身，圓潤曲線"
+      back: "Q版背面，細節簡化"
+    output_label: "Q版角色設計圖集"
+  color_scheme:
+    hair_color: "髮色：黑色（墨黑），漸層灰色陰影"
+    eye_color: "瞳色：留白處理，黑白對比"
+    clothing_main: "主色調：黑色線稿，灰色中間調，白色留白"
+    collar_shadow: "：深灰陰影"
+    waist_contrast: "：高對比黑色"
+    accessory_detail: "：精細線條，留白高光"
+    output_label: "黑白配色方案，灰階層次對比圖"
+  weapon_prop:
+    main_title: "手持道具設計拆解圖"
+    main_desc: "主體結構：三視圖展示（正面/側面/俯視）"
+    detail_a: "細節A：握柄/裝飾處放大特寫"
+    detail_b: "細節B：紋路/花紋細部描寫"
+    part_1: "部件1：主體外形"
+    part_2: "部件2：裝飾配件"
+    part_3: "部件3：連接結構"
+    output_label: "道具設計拆解圖"
+  hair_breakdown:
+    flower_detail: "花朵髮飾：精細花瓣層次，纏絲工藝"
+    tassel_detail: "流蘇垂墜：串珠流蘇，金屬墜飾"
+  action_pose:
+    pos2_desc: "跳躍動作，動態飄逸"
+    pos3_desc: "戰鬥姿勢，全身構圖"
+    pos4_desc: "角色比例圖，身高標示"
+    output_label: "人物動態姿勢集，角色比例指南"

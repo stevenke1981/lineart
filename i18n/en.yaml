@@ -12,3 +12,41 @@ terms:
   front_view: front view
   side_view: side view
   back_view: back view
+
+templates:
+  chibi_version:
+    style: "chibi-fied, two-head proportion, big head small body, cute style"
+    face_zoom: " (enlarged)"
+    cheek: "rounded cheeks"
+    hair_simplified: " (simplified)"
+    clothing_simplified: " (simplified)"
+    poses:
+      front: "chibi standing, big eyes"
+      side: "chibi side view, rounded curves"
+      back: "chibi back view, simplified details"
+    output_label: "chibi character design sheet collection"
+  color_scheme:
+    hair_color: "hair color: black (ink black), gradient gray shadow"
+    eye_color: "eye color: negative space, black-and-white contrast"
+    clothing_main: "main tone: black linework, gray midtones, white negative space"
+    collar_shadow: ": dark gray shadow"
+    waist_contrast: ": high contrast black"
+    accessory_detail: ": fine lines, negative space highlights"
+    output_label: "black and white color scheme, grayscale contrast diagram"
+  weapon_prop:
+    main_title: "held prop design breakdown diagram"
+    main_desc: "main structure: three-view display (front/side/top)"
+    detail_a: "detail A: grip/ornament zoom-in"
+    detail_b: "detail B: pattern/texture close-up"
+    part_1: "part 1: main body shape"
+    part_2: "part 2: decorative accessories"
+    part_3: "part 3: connecting structure"
+    output_label: "prop design breakdown diagram"
+  hair_breakdown:
+    flower_detail: "flower hair ornament: delicate petal layers, filigree craft"
+    tassel_detail: "tassel pendant: bead tassel, metal pendant"
+  action_pose:
+    pos2_desc: "jumping action, dynamic flow"
+    pos3_desc: "combat pose, full body composition"
+    pos4_desc: "character proportion chart, height annotation"
+    output_label: "dynamic action pose set, character proportion guide"

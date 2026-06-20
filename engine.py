@@ -175,10 +175,11 @@ def _get_env() -> Environment:
 
 
 def render_template(template_name: str, char_data: dict, lang: str = "zh") -> str:
-    """Render a Jinja2 template with character data."""
+    """Render a Jinja2 template with character data and i18n."""
     env = _get_env()
     template = env.get_template(template_name)
-    return template.render(char=char_data, lang=lang)
+    i18n = load_i18n(lang)
+    return template.render(char=char_data, lang=lang, i18n=i18n)
 
 
 # ── Assembly Pipeline ──────────────────────────────────────────────────

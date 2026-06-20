@@ -1,21 +1,22 @@
 {%- set lang = lang or 'zh' -%}
 {%- set c = char.components -%}
 {%- set o = char.outputs.chibi_version -%}
+{%- set t = i18n.templates.chibi_version -%}
 ###BASE###
 {{ char.base_style[lang] }}
 ###CHIBI_BASE###
-Q版化，二頭身比例，頭大身小，可愛風格
+{{ t.style }}
 ###FACE###
-{{ c.face.shape[lang] }}，{{ c.face.eyes[lang] }}（放大），圓潤臉頰
+{{ c.face.shape[lang] }}，{{ c.face.eyes[lang] }}{{ t.face_zoom }}，{{ t.cheek }}
 ###EXPRESSION###
 {{ c.expression.type[lang] }}，{{ c.expression.mouth[lang] }}
 ###HAIR###
-{{ c.hair.style[lang] }}（簡化），{% for acc in c.hair.accessories %}{{ acc[lang] }}{% if not loop.last %}，{% endif %}{% endfor %}
+{{ c.hair.style[lang] }}{{ t.hair_simplified }}，{% for acc in c.hair.accessories %}{{ acc[lang] }}{% if not loop.last %}，{% endif %}{% endfor %}
 ###CLOTHING###
-{{ c.clothing.robe[lang] }}（簡化版），{{ c.clothing.collar[lang] }}
+{{ c.clothing.robe[lang] }}{{ t.clothing_simplified }}，{{ c.clothing.collar[lang] }}
 ###CHIBI_POSES###
-[正面] Q版站立，大眼睛
-[側面] Q版側身，圓潤曲線
-[背面] Q版背面，細節簡化
+[正面] {{ t.poses.front }}
+[側面] {{ t.poses.side }}
+[背面] {{ t.poses.back }}
 ###OUTPUT###
-{{ o.style[lang] }}，Q版角色設計圖集
+{{ o.style[lang] }}，{{ t.output_label }}
