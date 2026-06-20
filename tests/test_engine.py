@@ -1,6 +1,7 @@
 """Tests for engine.py — core pipeline."""
 
 import pytest
+
 from engine import (
     build_custom_character,
     generate_prompt,

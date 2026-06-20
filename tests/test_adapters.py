@@ -1,6 +1,7 @@
 """Tests for adapters/ — model-specific prompt formatters."""
 
 import pytest
+
 from adapters import get_adapter
 from adapters.midjourney import MidjourneyAdapter
 from adapters.novelai import NovelAIAdapter
