@@ -11,6 +11,7 @@ from engine import (
     list_templates,
     load_character,
 )
+from exceptions import CharacterNotFoundError, TemplateNotFoundError
 
 
 class TestListCharacters:
@@ -55,7 +56,7 @@ class TestLoadCharacter:
         assert "clothing" in char["components"]
 
     def test_load_nonexistent_raises(self):
-        with pytest.raises(FileNotFoundError):
+        with pytest.raises(CharacterNotFoundError):
             load_character("nonexistent_char_xyz")
 
 
@@ -128,7 +129,7 @@ class TestGeneratePrompt:
             generate_prompt("three_view", model="unknown", char_id="sword_maiden")
 
     def test_unknown_template_raises(self):
-        with pytest.raises(ValueError, match="not found"):
+        with pytest.raises(TemplateNotFoundError):
             generate_prompt("nonexistent_template", model="sd", char_id="sword_maiden")
 
     def test_aspect_ratio_appended_for_sd(self):

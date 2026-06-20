@@ -183,6 +183,8 @@ def api_outputs(char_id: str) -> Response | tuple[Response, int]:
         return jsonify(result)
     except FileNotFoundError:
         return jsonify({"error": f"Character '{char_id}' not found"}), 404
+    except Exception:
+        return jsonify({"error": f"Error loading character '{char_id}'"}), 400
 
 
 if __name__ == "__main__":

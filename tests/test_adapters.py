@@ -6,6 +6,7 @@ from adapters import get_adapter
 from adapters.midjourney import MidjourneyAdapter
 from adapters.novelai import NovelAIAdapter
 from adapters.stable_diffusion import StableDiffusionAdapter
+from exceptions import ModelNotSupportedError
 
 SAMPLE_INTERMEDIATE = """###BASE###
 anime character sheet, black and white ink
@@ -36,7 +37,7 @@ class TestGetAdapter:
         assert isinstance(get_adapter("novelai"), NovelAIAdapter)
 
     def test_unknown_model_raises(self):
-        with pytest.raises(ValueError, match="Unknown model"):
+        with pytest.raises(ModelNotSupportedError):
             get_adapter("unknown_model")
 
     def test_case_insensitive(self):

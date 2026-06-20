@@ -6,6 +6,7 @@ import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from adapters import get_adapter
+from exceptions import CharacterNotFoundError, LanguageNotFoundError, TemplateNotFoundError
 
 # ── Paths ──────────────────────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).parent
@@ -19,7 +20,7 @@ def load_i18n(lang: str = "zh") -> dict:
     """Load a language dictionary."""
     filepath = I18N_DIR / f"{lang}.yaml"
     if not filepath.exists():
-        raise FileNotFoundError(f"Language file not found: {filepath}")
+        raise LanguageNotFoundError(f"Language file not found: {filepath}")
     with open(filepath, encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
 
@@ -37,7 +38,7 @@ def load_character(char_id: str) -> dict:
     """Load a character definition by ID."""
     filepath = CHARACTERS_DIR / f"{char_id}.yaml"
     if not filepath.exists():
-        raise FileNotFoundError(
+        raise CharacterNotFoundError(
             f"Character '{char_id}' not found. Available: {', '.join(list_characters())}"
         )
     with open(filepath, encoding="utf-8") as f:
@@ -225,7 +226,7 @@ def generate_prompt(
     # 2. Validate output type
     templates = list_templates()
     if output_type not in templates:
-        raise ValueError(
+        raise TemplateNotFoundError(
             f"Output type '{output_type}' not found. Available templates: {', '.join(templates)}"
         )
 

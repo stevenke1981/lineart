@@ -1,7 +1,5 @@
 """Pydantic schemas for character data validation."""
 
-from typing import Optional
-
 from pydantic import BaseModel
 
 
@@ -17,7 +15,7 @@ class CharacterOutput(BaseModel):
 
     label: BilingualField
     style: BilingualField
-    variants: Optional[list[dict]] = None
+    variants: list[dict] | None = None
 
 
 class Character(BaseModel):

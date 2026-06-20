@@ -12,6 +12,7 @@ from engine import (
     list_templates,
     load_character,
 )
+from exceptions import LineartError
 
 AR_PRESETS = ["3:4", "1:1", "4:3", "16:9", "9:16", "21:9", "9:21"]
 
@@ -193,8 +194,11 @@ def main() -> None:
                 print("Models: sd, mj, nai")
                 print(f"Aspect ratios: {', '.join(AR_PRESETS)}")
 
-    except Exception as e:
+    except LineartError as e:
         print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"Unexpected error: {e}", file=sys.stderr)
         sys.exit(1)
 
 
