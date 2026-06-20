@@ -1,5 +1,6 @@
 """Core prompt assembly engine."""
 
+import logging
 from pathlib import Path
 
 import yaml
@@ -7,6 +8,8 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from adapters import get_adapter
 from exceptions import CharacterNotFoundError, LanguageNotFoundError, TemplateNotFoundError
+
+logger = logging.getLogger(__name__)
 
 # ── Paths ──────────────────────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).parent
@@ -42,7 +45,9 @@ def load_character(char_id: str) -> dict:
             f"Character '{char_id}' not found. Available: {', '.join(list_characters())}"
         )
     with open(filepath, encoding="utf-8") as f:
-        return yaml.safe_load(f)["character"]
+        char_data = yaml.safe_load(f)["character"]
+    logger.info("Loaded character '%s'", char_id)
+    return char_data
 
 
 def list_templates() -> list[str]:
@@ -256,6 +261,13 @@ def generate_prompt(
     # 5. Adapt to model
     adapter = get_adapter(model)
     prompt = adapter.format(intermediate, lang=lang, ar=ar)
+    logger.info(
+        "Generated prompt: type=%s, model=%s, lang=%s, char=%s",
+        output_type,
+        model,
+        lang,
+        char_id or "custom",
+    )
 
     return prompt
 

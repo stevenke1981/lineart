@@ -7,6 +7,8 @@ Features:
 - Bilingual (zh/en) support
 """
 
+import logging
+
 from flask import Flask, Response, jsonify, render_template, request
 
 from engine import (
@@ -19,6 +21,7 @@ from engine import (
     load_character,
 )
 
+logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 AR_PRESETS = [

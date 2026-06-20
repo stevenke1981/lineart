@@ -1,6 +1,7 @@
 """Command-line interface for Lineart prompt generator."""
 
 import argparse
+import logging
 import sys
 
 from engine import (
@@ -14,6 +15,7 @@ from engine import (
 )
 from exceptions import LineartError
 
+logger = logging.getLogger(__name__)
 AR_PRESETS = ["3:4", "1:1", "4:3", "16:9", "9:16", "21:9", "9:21"]
 
 
