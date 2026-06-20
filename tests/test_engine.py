@@ -1,6 +1,7 @@
 """Tests for engine.py — core pipeline."""
 
 import pytest
+from pydantic import ValidationError
 
 from engine import (
     build_custom_character,
@@ -177,3 +178,52 @@ class TestBuildCustomCharacter:
         assert acc[0]["en"] == "flower"
         assert acc[1]["zh"] == "蝴蝶"
         assert acc[1]["en"] == "butterfly"
+
+
+class TestCharacterSchema:
+    """Tests for Pydantic character schema validation."""
+
+    def test_sword_maiden_validates(self):
+        from schemas import BilingualField, Character, CharacterOutput
+
+        char_data = load_character("sword_maiden")
+        char = Character(**char_data)
+        assert char.id == "sword_maiden"
+        assert isinstance(char.label, BilingualField)
+        assert "three_view" in char.outputs
+        assert isinstance(char.outputs["three_view"], CharacterOutput)
+
+    def test_custom_character_validates(self):
+        from schemas import Character
+
+        char_data = build_custom_character({})
+        char = Character(**char_data)
+        assert char.id == "custom"
+
+    def test_all_characters_validate(self):
+        from schemas import Character
+
+        for cid in list_characters():
+            char_data = load_character(cid)
+            char = Character(**char_data)
+            assert char.id == cid
+            assert len(char.outputs) > 0
+
+    def test_invalid_data_raises(self):
+        from schemas import Character
+
+        with pytest.raises(ValidationError):
+            Character(**{"id": 123})  # id should be str
+
+    def test_bilingual_field_requires_both(self):
+        from schemas import BilingualField
+
+        bf = BilingualField(zh="測試", en="test")
+        assert bf.zh == "測試"
+        assert bf.en == "test"
+
+    def test_bilingual_field_missing_en_raises(self):
+        from schemas import BilingualField
+
+        with pytest.raises(ValidationError):
+            BilingualField(zh="測試")  # missing 'en'
