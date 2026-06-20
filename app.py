@@ -7,7 +7,7 @@ Features:
 - Bilingual (zh/en) support
 """
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, Response, jsonify, render_template, request
 
 from engine import (
     build_custom_character,
@@ -46,7 +46,7 @@ LANGS = [
 
 
 # ── Metadata ───────────────────────────────────────────────────────────
-def get_characters_meta():
+def get_characters_meta() -> list[dict]:
     """Return list of {id, label_zh, label_en, outputs}."""
     meta = []
     for cid in list_characters():
@@ -71,7 +71,7 @@ def get_characters_meta():
     return meta
 
 
-def get_all_templates_meta():
+def get_all_templates_meta() -> list[dict]:
     """Return list of {key, zh, en} for all templates."""
     tmpls = list_templates()
     # Friendly names for templates
@@ -92,7 +92,7 @@ def get_all_templates_meta():
 
 
 @app.route("/")
-def index():
+def index() -> str:
     chars = get_characters_meta()
     templates = get_all_templates_meta()
     return render_template(
@@ -106,7 +106,7 @@ def index():
 
 
 @app.route("/generate", methods=["POST"])
-def generate():
+def generate() -> Response | tuple[Response, int]:
     mode = request.form.get("mode", "prebuilt")  # 'prebuilt' | 'custom'
     model = request.form.get("model", "sd")
     lang = request.form.get("lang", "zh")
@@ -153,17 +153,17 @@ def generate():
 
 
 @app.route("/api/characters")
-def api_characters():
+def api_characters() -> Response | tuple[Response, int]:
     return jsonify(get_characters_meta())
 
 
 @app.route("/api/templates")
-def api_templates():
+def api_templates() -> Response | tuple[Response, int]:
     return jsonify(get_all_templates_meta())
 
 
 @app.route("/api/outputs/<char_id>")
-def api_outputs(char_id):
+def api_outputs(char_id: str) -> Response | tuple[Response, int]:
     try:
         data = load_character(char_id)
         outputs = list_outputs(data)

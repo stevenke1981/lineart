@@ -16,7 +16,7 @@ from engine import (
 AR_PRESETS = ["3:4", "1:1", "4:3", "16:9", "9:16", "21:9", "9:21"]
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         prog="lineart",
         description="人物分鏡線稿提示詞生成器 — Anime character design prompt engine",
