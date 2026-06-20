@@ -14,11 +14,11 @@ class BaseAdapter(ABC):
     def _parse_blocks(self, text: str) -> dict[str, str]:
         """Parse intermediate format into labeled blocks."""
         blocks: dict[str, str] = {}
-        current_key = "HEADER"
+        current_key: str = "HEADER"
         current_lines: list[str] = []
 
         for line in text.splitlines():
-            line_stripped = line.strip()
+            line_stripped: str = line.strip()
             if line_stripped.startswith("###") and line_stripped.endswith("###"):
                 if current_lines:
                     blocks[current_key] = "\n".join(current_lines).strip()
@@ -35,7 +35,7 @@ class BaseAdapter(ABC):
 
     def _flatten_blocks(self, blocks: dict[str, str], sep: str = ", ") -> str:
         """Join all block values into a single string."""
-        parts = [v for v in blocks.values() if v]
+        parts: list[str] = [v for v in blocks.values() if v]
         return sep.join(parts)
 
     def _normalize_punct(self, text: str, lang: str = "zh") -> str:

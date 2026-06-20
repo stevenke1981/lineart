@@ -1,0 +1,101 @@
+character:
+  id: bushi
+  label:
+    zh: 武將
+    en: Samurai General
+
+  base_style:
+    zh: "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條"
+    en: "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines"
+
+  components:
+    face:
+      shape:
+        zh: 稜角方正臉
+        en: angular square jaw
+      eyes:
+        zh: 銳利劍眉星目
+        en: sharp piercing eyes
+
+    expression:
+      type:
+        zh: 威嚴
+        en: dignified
+      mouth:
+        zh: 緊抿嘴唇
+        en: tight-lipped
+
+    pose:
+      head_angle:
+        zh: 正面挺胸
+        en: facing forward chest out
+      action:
+        zh: 武士刀橫握站立
+        en: standing holding katana horizontally
+
+    hair:
+      style:
+        zh: 月代頭束髮
+        en: traditional topknot hairstyle
+      accessories:
+        - zh: 武士頭巾
+          en: samurai headband
+        - zh: 面頰傷疤
+          en: cheek scar
+
+    clothing:
+      robe:
+        zh: 陣羽織鎧甲
+        en: battle haori armor
+      collar:
+        zh: 立領護喉
+        en: standing collar throat guard
+      waist:
+        zh: 武士腰帶
+        en: samurai belt
+
+  outputs:
+    three_view:
+      label:
+        zh: 人物三視圖
+        en: character three-view sheet
+      style:
+        zh: 動畫原畫設定書風格，戰國武將設計圖集
+        en: animation keyframe setting book style, samurai design collection
+    expressions:
+      label:
+        zh: 表情演變五連圖
+        en: five-panel expression evolution sheet
+      style:
+        zh: 動畫原畫設定書風格
+        en: animation keyframe setting book style
+      variants:
+        - id: stern
+          zh: 嚴肅
+          en: stern
+        - id: angry
+          zh: 憤怒
+          en: enraged
+        - id: calm
+          zh: 沉穩
+          en: calm
+        - id: smiling
+          zh: 微笑
+          en: slight smile
+        - id: battle_cry
+          zh: 吶喊
+          en: battle cry
+    clothing_breakdown:
+      label:
+        zh: 鎧甲拆解圖
+        en: armor breakdown diagram
+      style:
+        zh: 武士鎧甲拆解圖，各部件分解展示
+        en: samurai armor breakdown, component decomposition
+    hair_breakdown:
+      label:
+        zh: 頭飾與武器拆解圖
+        en: headgear and weapon breakdown
+      style:
+        zh: 武士裝備細節拆解圖
+        en: samurai equipment detail breakdown

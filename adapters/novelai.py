@@ -4,13 +4,13 @@ from .base import BaseAdapter
 class NovelAIAdapter(BaseAdapter):
     """NovelAI format: curly-brace weighted tags, quality tags appended."""
 
-    name = "novelai"
+    name: str = "novelai"
 
-    QUALITY_TAGS = "best quality, amazing quality, very aesthetic, absurdres"
+    QUALITY_TAGS: str = "best quality, amazing quality, very aesthetic, absurdres"
 
     def format(self, intermediate: str, lang: str = "zh", ar: str = "") -> str:
-        blocks = self._parse_blocks(intermediate)
-        parts = []
+        blocks: dict[str, str] = self._parse_blocks(intermediate)
+        parts: list[str] = []
 
         for key, value in blocks.items():
             if key in ("BASE", "FACE", "OUTPUT"):
@@ -19,6 +19,6 @@ class NovelAIAdapter(BaseAdapter):
                 parts.append(value)
 
         # NAI uses English tags for quality
-        result = ", ".join(parts)
+        result: str = ", ".join(parts)
         result = self._normalize_punct(result, lang)
         return f"{result}, {self.QUALITY_TAGS}"

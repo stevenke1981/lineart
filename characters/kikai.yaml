@@ -1,0 +1,101 @@
+character:
+  id: kikai
+  label:
+    zh: 機械技師
+    en: Mecha Technician
+
+  base_style:
+    zh: "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條"
+    en: "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines"
+
+  components:
+    face:
+      shape:
+        zh: 瘦長臉型
+        en: lean elongated face
+      eyes:
+        zh: 細長單眼皮眼
+        en: narrow monolid eyes
+
+    expression:
+      type:
+        zh: 專注
+        en: focused
+      mouth:
+        zh: 咬著螺絲起子
+        en: biting a screwdriver
+
+    pose:
+      head_angle:
+        zh: 低頭俯視
+        en: looking down
+      action:
+        zh: 單手調整機械臂
+        en: adjusting a mechanical arm with one hand
+
+    hair:
+      style:
+        zh: 隨性短髮
+        en: messy short hair
+      accessories:
+        - zh: 護目鏡
+          en: safety goggles
+        - zh: 工具腰包
+          en: tool pouch
+
+    clothing:
+      robe:
+        zh: 連身工作服
+        en: mechanic jumpsuit
+      collar:
+        zh: 翻領
+        en: turned-down collar
+      waist:
+        zh: 多功能工具腰帶
+        en: multi-tool belt
+
+  outputs:
+    three_view:
+      label:
+        zh: 人物三視圖
+        en: character three-view sheet
+      style:
+        zh: 動畫原畫設定書風格，機械技師設計圖集
+        en: animation keyframe setting book style, mechanic design collection
+    expressions:
+      label:
+        zh: 表情演變五連圖
+        en: five-panel expression evolution sheet
+      style:
+        zh: 動畫原畫設定書風格
+        en: animation keyframe setting book style
+      variants:
+        - id: concentrated
+          zh: 集中
+          en: concentrated
+        - id: surprised
+          zh: 驚訝
+          en: surprised
+        - id: frustrated
+          zh: 挫折
+          en: frustrated
+        - id: proud
+          zh: 得意
+          en: proud
+        - id: tired
+          zh: 疲憊
+          en: exhausted
+    clothing_breakdown:
+      label:
+        zh: 服裝拆解圖
+        en: clothing breakdown diagram
+      style:
+        zh: 機械工裝拆解圖，工具細節展示
+        en: mechanic jumpsuit breakdown, tool detail showcase
+    hair_breakdown:
+      label:
+        zh: 裝備細節拆解圖
+        en: equipment detail breakdown
+      style:
+        zh: 維修裝備細節拆解圖
+        en: repair equipment detail breakdown

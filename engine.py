@@ -1,6 +1,8 @@
 """Core prompt assembly engine."""
 
 import logging
+from dataclasses import dataclass, field
+from functools import cache
 from pathlib import Path
 
 import yaml
@@ -80,88 +82,143 @@ def get_compatible_outputs(char_data: dict) -> list[str]:
 
 
 # ── Custom Character Builder ───────────────────────────────────────────
-def build_custom_character(form: dict, lang: str = "zh") -> dict:
+
+
+@dataclass
+class _BilingualDefault:
+    """A bilingual field with zh/en defaults."""
+
+    zh: str = ""
+    en: str = ""
+
+    def to_dict(self) -> dict[str, str]:
+        return {"zh": self.zh, "en": self.en}
+
+
+def _bd(zh: str, en: str) -> _BilingualDefault:
+    """Shorthand factory for _BilingualDefault."""
+    return _BilingualDefault(zh=zh, en=en)
+
+
+@dataclass
+class _CharacterForm:
+    """Structured form for building a custom character.
+
+    All fields have bilingual defaults — empty input falls back to them.
+    """
+
+    name: _BilingualDefault = field(default_factory=lambda: _bd("自訂角色", "Custom Character"))
+    face_shape: _BilingualDefault = field(default_factory=lambda: _bd("瓜子臉", "oval face"))
+    eyes: _BilingualDefault = field(default_factory=lambda: _bd("大眼睛", "big eyes"))
+    expression: _BilingualDefault = field(default_factory=lambda: _bd("無表情", "neutral"))
+    mouth: _BilingualDefault = field(default_factory=lambda: _bd("閉唇", "closed lips"))
+    head_angle: _BilingualDefault = field(default_factory=lambda: _bd("正面", "front facing"))
+    action: _BilingualDefault = field(default_factory=lambda: _bd("站立", "standing"))
+    hair_style: _BilingualDefault = field(default_factory=lambda: _bd("長髮", "long hair"))
+    hair_acc: _BilingualDefault = field(default_factory=lambda: _bd("", ""))
+    robe: _BilingualDefault = field(default_factory=lambda: _bd("上衣", "top"))
+    collar: _BilingualDefault = field(default_factory=lambda: _bd("圓領", "round collar"))
+    waist: _BilingualDefault = field(default_factory=lambda: _bd("腰帶", "belt"))
+
+    @classmethod
+    def from_form_dict(cls, form: dict[str, str]) -> "_CharacterForm":
+        """Build a form from a flat dict (e.g. CLI args or HTTP POST)."""
+        return cls(
+            name=_BilingualDefault(
+                zh=form.get("char_name", "").strip() or "自訂角色",
+                en=form.get("char_name_en", "").strip() or "Custom Character",
+            ),
+            face_shape=_BilingualDefault(
+                zh=form.get("face_shape", "").strip() or "瓜子臉",
+                en=form.get("face_shape_en", "").strip() or "oval face",
+            ),
+            eyes=_BilingualDefault(
+                zh=form.get("eyes", "").strip() or "大眼睛",
+                en=form.get("eyes_en", "").strip() or "big eyes",
+            ),
+            expression=_BilingualDefault(
+                zh=form.get("expression", "").strip() or "無表情",
+                en=form.get("expression_en", "").strip() or "neutral",
+            ),
+            mouth=_BilingualDefault(
+                zh=form.get("mouth", "").strip() or "閉唇",
+                en=form.get("mouth_en", "").strip() or "closed lips",
+            ),
+            head_angle=_BilingualDefault(
+                zh=form.get("head_angle", "").strip() or "正面",
+                en=form.get("head_angle_en", "").strip() or "front facing",
+            ),
+            action=_BilingualDefault(
+                zh=form.get("action", "").strip() or "站立",
+                en=form.get("action_en", "").strip() or "standing",
+            ),
+            hair_style=_BilingualDefault(
+                zh=form.get("hair_style", "").strip() or "長髮",
+                en=form.get("hair_style_en", "").strip() or "long hair",
+            ),
+            hair_acc=_BilingualDefault(
+                zh=form.get("hair_acc", "").strip(),
+                en=form.get("hair_acc_en", "").strip(),
+            ),
+            robe=_BilingualDefault(
+                zh=form.get("robe", "").strip() or "上衣",
+                en=form.get("robe_en", "").strip() or "top",
+            ),
+            collar=_BilingualDefault(
+                zh=form.get("collar", "").strip() or "圓領",
+                en=form.get("collar_en", "").strip() or "round collar",
+            ),
+            waist=_BilingualDefault(
+                zh=form.get("waist", "").strip() or "腰帶",
+                en=form.get("waist_en", "").strip() or "belt",
+            ),
+        )
+
+    def to_character_dict(self) -> dict:
+        """Convert this form into a character dict for the pipeline."""
+        return {
+            "id": "custom",
+            "label": self.name.to_dict(),
+            "base_style": {
+                "zh": "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條",
+                "en": (
+                    "anime character design sheet, black and white ink, "
+                    "clean lineart, white background, ultra-fine lines"
+                ),
+            },
+            "components": {
+                "face": {
+                    "shape": self.face_shape.to_dict(),
+                    "eyes": self.eyes.to_dict(),
+                },
+                "expression": {
+                    "type": self.expression.to_dict(),
+                    "mouth": self.mouth.to_dict(),
+                },
+                "pose": {
+                    "head_angle": self.head_angle.to_dict(),
+                    "action": self.action.to_dict(),
+                },
+                "hair": {
+                    "style": self.hair_style.to_dict(),
+                    "accessories": _split_acc(self.hair_acc.zh, self.hair_acc.en),
+                },
+                "clothing": {
+                    "robe": self.robe.to_dict(),
+                    "collar": self.collar.to_dict(),
+                    "waist": self.waist.to_dict(),
+                },
+            },
+            "outputs": {},
+        }
+
+
+def build_custom_character(form: dict[str, str], lang: str = "zh") -> dict:
     """Build a character dict from form fields (for custom character).
 
     Every field has a bilingual default — empty form input falls back to it.
     """
-    # ── Defaults ──────────────────────────────────────────────────────
-    defaults = {
-        "char_name": ("自訂角色", "Custom Character"),
-        "char_name_en": ("自訂角色", "Custom Character"),
-        "face_shape": ("瓜子臉", "oval face"),
-        "face_shape_en": ("瓜子臉", "oval face"),
-        "eyes": ("大眼睛", "big eyes"),
-        "eyes_en": ("大眼睛", "big eyes"),
-        "expression": ("無表情", "neutral"),
-        "expression_en": ("無表情", "neutral"),
-        "mouth": ("閉唇", "closed lips"),
-        "mouth_en": ("閉唇", "closed lips"),
-        "head_angle": ("正面", "front facing"),
-        "head_angle_en": ("正面", "front facing"),
-        "action": ("站立", "standing"),
-        "action_en": ("站立", "standing"),
-        "hair_style": ("長髮", "long hair"),
-        "hair_style_en": ("長髮", "long hair"),
-        "hair_acc": ("", ""),
-        "hair_acc_en": ("", ""),
-        "robe": ("上衣", "top"),
-        "robe_en": ("上衣", "top"),
-        "collar": ("圓領", "round collar"),
-        "collar_en": ("圓領", "round collar"),
-        "waist": ("腰帶", "belt"),
-        "waist_en": ("腰帶", "belt"),
-    }
-
-    def val(key):
-        raw = form.get(key, "").strip()
-        if raw:
-            return raw
-        # Fall back to default
-        zh_def, en_def = defaults.get(key, ("", ""))
-        if key.endswith("_en"):
-            return en_def
-        return zh_def
-
-    def t(zh_key, en_key):
-        return {"zh": val(zh_key), "en": val(en_key)}
-
-    char = {
-        "id": "custom",
-        "label": t("char_name", "char_name_en"),
-        "base_style": {
-            "zh": "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條",
-            "en": (
-                "anime character design sheet, black and white ink, "
-                "clean lineart, white background, ultra-fine lines"
-            ),
-        },
-        "components": {
-            "face": {
-                "shape": t("face_shape", "face_shape_en"),
-                "eyes": t("eyes", "eyes_en"),
-            },
-            "expression": {
-                "type": t("expression", "expression_en"),
-                "mouth": t("mouth", "mouth_en"),
-            },
-            "pose": {
-                "head_angle": t("head_angle", "head_angle_en"),
-                "action": t("action", "action_en"),
-            },
-            "hair": {
-                "style": t("hair_style", "hair_style_en"),
-                "accessories": _split_acc(val("hair_acc"), val("hair_acc_en")),
-            },
-            "clothing": {
-                "robe": t("robe", "robe_en"),
-                "collar": t("collar", "collar_en"),
-                "waist": t("waist", "waist_en"),
-            },
-        },
-        "outputs": {},
-    }
-    return char
+    return _CharacterForm.from_form_dict(form).to_character_dict()
 
 
 def _split_acc(zh_text: str, en_text: str) -> list[dict]:
@@ -181,17 +238,15 @@ def _split_acc(zh_text: str, en_text: str) -> list[dict]:
 
 
 # ── Template Engine ────────────────────────────────────────────────────
-_jinja_env: Environment | None = None
 
 
+@cache
 def _get_env() -> Environment:
-    global _jinja_env
-    if _jinja_env is None:
-        _jinja_env = Environment(
-            loader=FileSystemLoader(str(TEMPLATES_DIR)),
-            autoescape=select_autoescape(["html", "xml"]),
-        )
-    return _jinja_env
+    """Get (or create) the cached Jinja2 environment."""
+    return Environment(
+        loader=FileSystemLoader(str(TEMPLATES_DIR)),
+        autoescape=select_autoescape(["html", "xml"]),
+    )
 
 
 def render_template(template_name: str, char_data: dict, lang: str = "zh") -> str:
