@@ -59,6 +59,20 @@ def list_outputs(char_data: dict) -> list[str]:
     return sorted(defined | available)
 
 
+def get_defined_outputs(char_data: dict) -> list[str]:
+    """Return only output types that a character actually defines in YAML."""
+    return sorted(char_data.get("outputs", {}).keys())
+
+
+def get_compatible_outputs(char_data: dict) -> list[str]:
+    """Return output types that can be safely used with this character.
+
+    Includes both defined outputs and available templates.
+    For templates without a character definition, fallback is applied.
+    """
+    return list_outputs(char_data)
+
+
 # ── Custom Character Builder ───────────────────────────────────────────
 def build_custom_character(form: dict, lang: str = "zh") -> dict:
     """Build a character dict from form fields (for custom character).
@@ -215,14 +229,24 @@ def generate_prompt(
             f"Output type '{output_type}' not found. Available templates: {', '.join(templates)}"
         )
 
-    # 3. Ensure output type entry exists
+    # 3. Ensure output type entry exists with complete fields
     if "outputs" not in char_data:
         char_data["outputs"] = {}
     if output_type not in char_data["outputs"]:
         char_data["outputs"][output_type] = {
             "label": {"zh": output_type, "en": output_type},
             "style": {"zh": "", "en": ""},
+            "variants": [],
         }
+    else:
+        # Ensure sub-fields exist even for defined outputs
+        output_def = char_data["outputs"][output_type]
+        if "label" not in output_def:
+            output_def["label"] = {"zh": output_type, "en": output_type}
+        if "style" not in output_def:
+            output_def["style"] = {"zh": "", "en": ""}
+        if "variants" not in output_def:
+            output_def["variants"] = []
 
     # 4. Render intermediate format
     template_name = f"{output_type}.j2"
