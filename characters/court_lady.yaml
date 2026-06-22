@@ -1,5 +1,9 @@
 character:
   id: court_lady
+  gender:
+    zh: 女
+    en: female
+
   label:
     zh: 古風宮廷少女
     en: Ancient Court Lady

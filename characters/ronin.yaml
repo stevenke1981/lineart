@@ -1,0 +1,104 @@
+character:
+  id: ronin
+  gender:
+    zh: 男
+    en: male
+  label:
+    zh: 浪人劍客
+    en: Wandering Ronin
+
+  base_style:
+    zh: "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條"
+    en: "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines"
+
+  components:
+    face:
+      shape:
+        zh: 稜角滄桑臉
+        en: angular weathered face
+      eyes:
+        zh: 銳利三白眼
+        en: sharp sanpaku eyes
+
+    expression:
+      type:
+        zh: 冷峻
+        en: stoic
+      mouth:
+        zh: 叼草莖
+        en: holding grass stem
+
+    pose:
+      head_angle:
+        zh: 低頭側視
+        en: lowered head side glance
+      action:
+        zh: 按刀站立
+        en: standing with hand on katana
+
+    hair:
+      style:
+        zh: 半束亂髮
+        en: half-tied messy hair
+      accessories:
+        - zh: 額頭布帶
+          en: forehead headband
+        - zh: 耳上傷疤
+          en: ear scar
+
+    clothing:
+      robe:
+        zh: 破舊羽織
+        en: worn-out haori
+      collar:
+        zh: 敞懷內襯
+        en: open-chested inner layer
+      waist:
+        zh: 武士刀帶
+        en: katana belt
+
+  outputs:
+    three_view:
+      label:
+        zh: 人物三視圖
+        en: character three-view sheet
+      style:
+        zh: 動畫原畫設定書風格，浪人武士畫集
+        en: animation keyframe setting book style, ronin samurai collection
+    expressions:
+      label:
+        zh: 表情演變五連圖
+        en: five-panel expression evolution sheet
+      style:
+        zh: 動畫原畫設定書風格
+        en: animation keyframe setting book style
+      variants:
+        - id: stoic
+          zh: 冷峻
+          en: stoic
+        - id: fierce
+          zh: 兇狠
+          en: fierce
+        - id: weary
+          zh: 倦怠
+          en: weary
+        - id: grinning
+          zh: 咧嘴笑
+          en: grinning
+        - id: alert
+          zh: 警戒
+          en: alert
+    clothing_breakdown:
+      label:
+        zh: 服裝拆解圖
+        en: clothing breakdown diagram
+      style:
+        zh: 浪人服裝拆解圖，破舊質感展示
+        en: ronin clothing breakdown, worn texture showcase
+    hair_breakdown:
+      label:
+        zh: 髮飾與傷疤拆解圖
+        en: hair and scar breakdown diagram
+      style:
+        zh: 浪人細節拆解圖
+        en: ronin detail breakdown

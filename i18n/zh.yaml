@@ -50,3 +50,13 @@ templates:
     pos3_desc: "戰鬥姿勢，全身構圖"
     pos4_desc: "角色比例圖，身高標示"
     output_label: "人物動態姿勢集，角色比例指南"
+
+gender:
+  male: 男
+  female: 女
+  neutral: 中性
+  genderless: 無性別
+  tag_male: 男性角色
+  tag_female: 女性角色
+  tag_neutral: 中性角色
+  tag_genderless: 無性別角色

@@ -1,5 +1,9 @@
 character:
   id: bushi
+  gender:
+    zh: 男
+    en: male
+
   label:
     zh: 武將
     en: Samurai General

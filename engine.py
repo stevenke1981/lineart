@@ -48,6 +48,8 @@ def load_character(char_id: str) -> dict:
         )
     with open(filepath, encoding="utf-8") as f:
         char_data = yaml.safe_load(f)["character"]
+    if "gender" not in char_data:
+        char_data["gender"] = {"zh": "中性", "en": "neutral"}
     logger.info("Loaded character '%s'", char_id)
     return char_data
 
@@ -108,6 +110,7 @@ class _CharacterForm:
     """
 
     name: _BilingualDefault = field(default_factory=lambda: _bd("自訂角色", "Custom Character"))
+    gender: _BilingualDefault = field(default_factory=lambda: _bd("中性", "neutral"))
     face_shape: _BilingualDefault = field(default_factory=lambda: _bd("瓜子臉", "oval face"))
     eyes: _BilingualDefault = field(default_factory=lambda: _bd("大眼睛", "big eyes"))
     expression: _BilingualDefault = field(default_factory=lambda: _bd("無表情", "neutral"))
@@ -127,6 +130,10 @@ class _CharacterForm:
             name=_BilingualDefault(
                 zh=form.get("char_name", "").strip() or "自訂角色",
                 en=form.get("char_name_en", "").strip() or "Custom Character",
+            ),
+            gender=_BilingualDefault(
+                zh=form.get("gender", "").strip() or "中性",
+                en=form.get("gender_en", "").strip() or "neutral",
             ),
             face_shape=_BilingualDefault(
                 zh=form.get("face_shape", "").strip() or "瓜子臉",
@@ -179,6 +186,7 @@ class _CharacterForm:
         return {
             "id": "custom",
             "label": self.name.to_dict(),
+            "gender": self.gender.to_dict(),
             "base_style": {
                 "zh": "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條",
                 "en": (

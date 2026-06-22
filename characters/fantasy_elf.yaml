@@ -1,5 +1,9 @@
 character:
   id: fantasy_elf
+  gender:
+    zh: 女
+    en: female
+
   label:
     zh: 森林精靈
     en: Forest Elf

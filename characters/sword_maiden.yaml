@@ -1,5 +1,9 @@
 character:
   id: sword_maiden
+  gender:
+    zh: 女
+    en: female
+
   label:
     zh: 仙俠劍姬
     en: Xianxia Sword Maiden

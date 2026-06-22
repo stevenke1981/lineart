@@ -3,6 +3,8 @@
 {%- set o = char.outputs.expressions -%}
 ###BASE###
 {{ char.base_style[lang] }}
+###GENDER###
+{{ i18n.gender["tag_" + char.gender.en] }}
 ###FACE###
 {{ c.face.shape[lang] }}，{{ c.face.eyes[lang] }}
 ###HAIR###

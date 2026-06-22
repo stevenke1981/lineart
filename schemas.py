@@ -23,6 +23,7 @@ class Character(BaseModel):
 
     id: str
     label: BilingualField
+    gender: BilingualField | None = None
     base_style: BilingualField
     components: dict
     outputs: dict[str, CharacterOutput]

@@ -5,23 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lineart — 人物分鏡線稿提示詞生成器</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.3"></script>
+  <style>
+    .htmx-indicator { opacity: 0; transition: opacity 0.3s ease; }
+    .htmx-request .htmx-indicator { opacity: 1; }
+    .htmx-swapping { opacity: 0; transition: opacity 0.3s ease; }
+  </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" x-data="{ tab: 'prebuilt' }">
     <header>
-      <h1>🎨 Lineart</h1>
+      <h1>Lineart</h1>
       <p class="subtitle">人物分鏡線稿提示詞生成器 — 多輸出・自訂角色・畫面比例</p>
+      <nav style="margin-top:0.5rem;">
+        <a href="/" :style="{ fontWeight: tab === 'prebuilt' || tab === 'custom' ? 'normal' : 'bold' }">產生器</a>
+        &nbsp;|&nbsp;
+        <a href="/history">歷史記錄</a>
+      </nav>
     </header>
 
     <div class="tabs">
-      <button class="tab-btn active" data-tab="prebuilt" onclick="switchTab('prebuilt')">📦 內建角色</button>
-      <button class="tab-btn" data-tab="custom" onclick="switchTab('custom')">✏️ 自訂角色</button>
+      <button class="tab-btn"
+              :class="{ active: tab === 'prebuilt' }"
+              @click="tab = 'prebuilt'">
+        內建角色
+      </button>
+      <button class="tab-btn"
+              :class="{ active: tab === 'custom' }"
+              @click="tab = 'custom'">
+        自訂角色
+      </button>
     </div>
 
     <!-- ════════ 內建角色 ════════ -->
-    <div id="tab-prebuilt" class="tab-content active">
+    <div id="tab-prebuilt" x-show="tab === 'prebuilt'" x-cloak>
       <div class="card">
-        <form id="formPrebuilt">
+        <form id="formPrebuilt"
+              hx-post="/generate"
+              hx-target="#result-area"
+              hx-indicator="#loading"
+              hx-target-error="#error-area"
+              hx-history="false">
           <input type="hidden" name="mode" value="prebuilt">
 
           <div class="form-grid two-col">
@@ -35,16 +60,25 @@
               </select>
             </div>
             <div class="field">
-              <label for="model">AI 模型</label>
-              <select id="model" name="model">
-                {% for m in models %}
-                <option value="{{ m.key }}">{{ m.label_zh }}</option>
+              <label for="gender_prebuilt">性別</label>
+              <select id="gender_prebuilt" name="gender">
+                <option value="">— 使用角色預設 —</option>
+                {% for g in gender_options %}
+                <option value="{{ g.key }}">{{ g.label_zh }}</option>
                 {% endfor %}
               </select>
             </div>
           </div>
 
-          <!-- 輸出類型多選 -->
+          <div class="field">
+            <label for="model">AI 模型</label>
+            <select id="model" name="model">
+              {% for m in models %}
+              <option value="{{ m.key }}">{{ m.label_zh }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
           <div class="field">
             <label>輸出類型 <span class="hint">（可複選）</span></label>
             <div class="checkbox-grid" id="outputCheckboxes">
@@ -57,7 +91,6 @@
             </div>
           </div>
 
-          <!-- 畫面比例 + 語言 -->
           <div class="form-grid two-col">
             <div class="field">
               <label for="ar_prebuilt">畫面比例</label>
@@ -84,9 +117,14 @@
     </div>
 
     <!-- ════════ 自訂角色 ════════ -->
-    <div id="tab-custom" class="tab-content">
+    <div id="tab-custom" x-show="tab === 'custom'" x-cloak>
       <div class="card">
-        <form id="formCustom">
+        <form id="formCustom"
+              hx-post="/generate"
+              hx-target="#result-area"
+              hx-indicator="#loading"
+              hx-target-error="#error-area"
+              hx-history="false">
           <input type="hidden" name="mode" value="custom">
 
           <div class="field">
@@ -94,6 +132,22 @@
             <div class="form-grid two-col">
               <input type="text" name="char_name" placeholder="中文名稱 (例如：忍者)" class="input">
               <input type="text" name="char_name_en" placeholder="English Name (e.g. Ninja)" class="input">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>性別</label>
+            <div class="form-grid two-col">
+              <select name="gender">
+                {% for g in gender_options %}
+                <option value="{{ g.key }}" {% if g.key == 'neutral' %}selected{% endif %}>{{ g.label_zh }}</option>
+                {% endfor %}
+              </select>
+              <select name="gender_en">
+                {% for g in gender_options %}
+                <option value="{{ g.key }}" {% if g.key == 'neutral' %}selected{% endif %}>{{ g.label_en }}</option>
+                {% endfor %}
+              </select>
             </div>
           </div>
 
@@ -120,7 +174,7 @@
             </div>
             <div class="field">
               <label>嘴巴</label>
-              <input type="text" name="mouth" placeholder="張開說出「你!」" class="input">
+              <input type="text" name="mouth" placeholder='張開說出「你!」' class="input">
               <input type="text" name="mouth_en" placeholder='mouth open' class="input-sm">
             </div>
             <div class="field">
@@ -168,7 +222,6 @@
             </div>
           </div>
 
-          <!-- 輸出類型多選 (共用) -->
           <div class="section-divider">輸出設定</div>
           <div class="form-grid two-col">
             <div class="field">
@@ -216,127 +269,16 @@
       </div>
     </div>
 
-    <!-- ════════ 結果顯示區 ════════ -->
-    <div id="result-area" style="display:none;"></div>
-    <div id="error-area" style="display:none;"></div>
-    <div id="loading" class="card loading-card" style="display:none;">
+    <!-- ════════ 結果與狀態 ════════ -->
+    <div id="result-area"></div>
+    <div id="error-area"></div>
+    <div id="loading" class="card loading-card htmx-indicator" style="display:none;">
       <p>⏳ 正在產生提示詞...</p>
     </div>
   </div>
 
-  <script>
-    // ── Tab Switching ──
-    function switchTab(name) {
-      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
-      document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
-      document.getElementById("tab-" + name).classList.add("active");
-      document.querySelector(`.tab-btn[data-tab="${name}"]`).classList.add("active");
-      // Clear previous results
-      document.getElementById("result-area").style.display = "none";
-      document.getElementById("error-area").style.display = "none";
-    }
-
-    // ── Form Submit (shared) ──
-    function setupForm(formId) {
-      document.getElementById(formId).addEventListener("submit", async function(e) {
-        e.preventDefault();
-        const resultArea = document.getElementById("result-area");
-        const errorArea = document.getElementById("error-area");
-        const loading = document.getElementById("loading");
-
-        resultArea.style.display = "none";
-        errorArea.style.display = "none";
-        loading.style.display = "block";
-
-        const formData = new FormData(this);
-
-        try {
-          const res = await fetch("/generate", { method: "POST", body: formData });
-          const data = await res.json();
-          loading.style.display = "none";
-
-          if (data.error) {
-            errorArea.innerHTML = `<div class="card error-card"><p>❌ ${data.error}</p></div>`;
-            errorArea.style.display = "block";
-            return;
-          }
-
-          // Build results HTML
-          let html = '';
-          const results = data.results || {};
-          const count = Object.keys(results).length;
-
-          for (const [type, prompt] of Object.entries(results)) {
-            const typeLabel = typeNames[type] || type;
-            html += `
-              <div class="card result-card">
-                <div class="result-header">
-                  <h2>📝 ${typeLabel}</h2>
-                  <button class="btn-copy" onclick='copyText(\`${escapeJs(prompt)}\`, this)'>📋 複製</button>
-                </div>
-                <textarea class="prompt-output" readonly rows="${Math.max(4, Math.ceil(prompt.length / 80))}">${escapeHtml(prompt)}</textarea>
-              </div>
-            `;
-          }
-
-          resultArea.innerHTML = html;
-          resultArea.style.display = "block";
-          resultArea.scrollIntoView({ behavior: "smooth" });
-
-        } catch (err) {
-          loading.style.display = "none";
-          errorArea.innerHTML = `<div class="card error-card"><p>❌ 網路錯誤：${err.message}</p></div>`;
-          errorArea.style.display = "block";
-        }
-      });
-    }
-
-    setupForm("formPrebuilt");
-    setupForm("formCustom");
-
-    // ── Helpers ──
-    const typeNames = {
-      {% for t in templates %}
-      "{{ t.key }}": "{{ t.zh }}",
-      {% endfor %}
-    };
-
-    function escapeHtml(str) {
-      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
-    function escapeJs(str) {
-      return str.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
-    }
-
-    async function copyText(text, btn) {
-      try {
-        await navigator.clipboard.writeText(text);
-        btn.textContent = "✅ 已複製";
-        setTimeout(() => { btn.textContent = "📋 複製"; }, 2000);
-      } catch {
-        // Fallback
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
-        btn.textContent = "✅ 已複製";
-        setTimeout(() => { btn.textContent = "📋 複製"; }, 2000);
-      }
-    }
-
-    // ── Ctrl+Enter shortcut ──
-    document.addEventListener("keydown", function(e) {
-      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-        const activeTab = document.querySelector(".tab-content.active");
-        if (activeTab) {
-          const form = activeTab.querySelector("form");
-          if (form) form.requestSubmit();
-        }
-      }
-    });
-  </script>
+  <style>
+    [x-cloak] { display: none !important; }
+  </style>
 </body>
 </html>

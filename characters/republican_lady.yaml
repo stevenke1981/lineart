@@ -1,5 +1,9 @@
 character:
   id: republican_lady
+  gender:
+    zh: 女
+    en: female
+
   label:
     zh: 民國名媛
     en: Republican Era Socialite

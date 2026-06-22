@@ -50,3 +50,13 @@ templates:
     pos3_desc: "combat pose, full body composition"
     pos4_desc: "character proportion chart, height annotation"
     output_label: "dynamic action pose set, character proportion guide"
+
+gender:
+  male: male
+  female: female
+  neutral: neutral
+  genderless: genderless
+  tag_male: male character
+  tag_female: female character
+  tag_neutral: neutral character
+  tag_genderless: genderless character

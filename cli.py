@@ -14,6 +14,14 @@ from engine import (
     load_character,
 )
 from exceptions import LineartError
+from history import (
+    clear_history,
+    delete_prompt,
+    export_history,
+    get_history,
+    get_prompt,
+    save_prompt,
+)
 
 logger = logging.getLogger(__name__)
 AR_PRESETS: list[str] = ["3:4", "1:1", "4:3", "16:9", "9:16", "21:9", "9:21"]
@@ -76,6 +84,8 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     gen.add_argument("--collar-en", help="Collar (en)")
     gen.add_argument("--waist", help="Waist (zh)")
     gen.add_argument("--waist-en", help="Waist (en)")
+    gen.add_argument("--gender", help="性別 (男/女/中性/無性別)")
+    gen.add_argument("--gender-en", help="Gender (male/female/neutral/genderless)")
 
     # ── list ──────────────────────────────────────────────────────────
     lst: argparse.ArgumentParser = sub.add_parser("list", help="List available resources")
@@ -87,6 +97,34 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         help="What to list (default: characters)",
     )
     lst.add_argument("--character", "-c", help="Character ID (required for 'outputs')")
+
+    # ── history ────────────────────────────────────────────────────────
+    hist: argparse.ArgumentParser = sub.add_parser("history", help="Manage prompt history")
+    hist_sub = hist.add_subparsers(dest="history_cmd", required=True)
+
+    # history list
+    hist_list = hist_sub.add_parser("list", help="List history records")
+    hist_list.add_argument("--page", type=int, default=1, help="Page number")
+    hist_list.add_argument("--model", default="", help="Filter by model")
+    hist_list.add_argument("--type", dest="output_type", default="", help="Filter by output type")
+
+    # history show
+    hist_show = hist_sub.add_parser("show", help="Show a single record")
+    hist_show.add_argument("id", type=int, help="Record ID")
+
+    # history delete
+    hist_del = hist_sub.add_parser("delete", help="Delete a record")
+    hist_del.add_argument("id", type=int, help="Record ID")
+
+    # history clear
+    hist_sub.add_parser("clear", help="Clear all records")
+
+    # history export
+    hist_export = hist_sub.add_parser("export", help="Export history")
+    hist_export.add_argument(
+        "--format", choices=["json", "csv"], default="json", help="Export format"
+    )
+    hist_export.add_argument("--output", default="", help="Output file path")
 
     return parser
 
@@ -118,6 +156,8 @@ def _build_form(args: argparse.Namespace) -> dict[str, str]:
         "collar_en": args.collar_en or "",
         "waist": args.waist or "",
         "waist_en": args.waist_en or "",
+        "gender": args.gender or "",
+        "gender_en": args.gender_en or "",
     }
 
 
@@ -126,18 +166,43 @@ def _handle_generate(args: argparse.Namespace) -> None:
     if args.custom:
         char_data = build_custom_character(_build_form(args))
         char_id = ""
+        char_label = char_data.get("label", {}).get("zh", "")
     else:
         if not args.character:
             print("Error: specify a character or use --custom", file=sys.stderr)
             sys.exit(1)
         char_data = None
         char_id = args.character
+        try:
+            tmp = load_character(char_id)
+            char_label = tmp.get("label", {}).get("zh", char_id)
+        except Exception:
+            char_label = char_id
 
     if not args.type:
         print("Error: specify --type (e.g. --type three_view,expressions)", file=sys.stderr)
         sys.exit(1)
 
     output_types: list[str] = [o.strip() for o in args.type.split(",") if o.strip()]
+
+    def _save(ot: str, prompt: str) -> None:
+        try:
+            gender = ""
+            if char_data:
+                gender = char_data.get("gender", {}).get("zh", "")
+            save_prompt(
+                mode="custom" if args.custom else "prebuilt",
+                character=char_id,
+                char_label=char_label,
+                gender=gender,
+                model=args.model,
+                lang=args.lang,
+                ar=args.ar,
+                output_type=ot,
+                prompt=prompt,
+            )
+        except Exception:
+            pass
 
     if len(output_types) == 1:
         prompt = generate_prompt(
@@ -148,6 +213,7 @@ def _handle_generate(args: argparse.Namespace) -> None:
             char_id=char_id,
             char_data=char_data,
         )
+        _save(output_types[0], prompt)
         print(prompt)
     else:
         results: dict[str, str] = generate_prompts(
@@ -159,6 +225,7 @@ def _handle_generate(args: argparse.Namespace) -> None:
             char_data=char_data,
         )
         for ot, prompt in results.items():
+            _save(ot, prompt)
             print(f"═══ {ot} ═══")
             print(prompt)
             print()
@@ -202,6 +269,64 @@ def _handle_list(args: argparse.Namespace) -> None:
         print(f"Aspect ratios: {', '.join(AR_PRESETS)}")
 
 
+def _handle_history(args: argparse.Namespace) -> None:
+    """Handle the 'history' subcommand."""
+    cmd = args.history_cmd
+
+    if cmd == "list":
+        model = args.model or None
+        output_type = args.output_type or None
+        data = get_history(page=args.page, model=model, output_type=output_type)
+        records = data["items"]
+        if not records:
+            print("No history records found.")
+            return
+        print(f"History (page {data['page']}/{data['pages']}, {data['total']} total):")
+        for r in records:
+            preview = r["prompt"][:60] + "..." if len(r["prompt"]) > 60 else r["prompt"]
+            char_name = r["char_label"] or r["character"] or ""
+            print(
+                f"  [{r['id']:4d}] {r['created_at']} | {char_name:<20s} | "
+                f"{r['model']:3s} | {r['output_type']:<18s} | {preview}"
+            )
+
+    elif cmd == "show":
+        prompt_data = get_prompt(args.id)
+        if not prompt_data:
+            print(f"Record #{args.id} not found.", file=sys.stderr)
+            sys.exit(1)
+        print(f"ID:          {prompt_data['id']}")
+        print(f"Created:     {prompt_data['created_at']}")
+        print(f"Mode:        {prompt_data['mode']}")
+        print(f"Character:   {prompt_data['char_label'] or prompt_data['character']}")
+        print(f"Gender:      {prompt_data['gender']}")
+        print(f"Model:       {prompt_data['model']}")
+        print(f"Language:    {prompt_data['lang']}")
+        print(f"Aspect:      {prompt_data['ar']}")
+        print(f"Output:      {prompt_data['output_type']}")
+        print("Prompt:")
+        print(prompt_data["prompt"])
+
+    elif cmd == "delete":
+        if delete_prompt(args.id):
+            print(f"Record #{args.id} deleted.")
+        else:
+            print(f"Record #{args.id} not found.", file=sys.stderr)
+            sys.exit(1)
+
+    elif cmd == "clear":
+        count = clear_history()
+        print(f"Cleared {count} history record(s).")
+
+    elif cmd == "export":
+        filepath = args.output or None
+        content = export_history(format=args.format, filepath=filepath)
+        if filepath:
+            print(f"Exported to {filepath}")
+        else:
+            print(content)
+
+
 def main() -> None:
     """Main entry point for CLI."""
     parser = _build_arg_parser()
@@ -212,6 +337,8 @@ def main() -> None:
             _handle_generate(args)
         elif args.command == "list":
             _handle_list(args)
+        elif args.command == "history":
+            _handle_history(args)
     except LineartError as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)

@@ -29,3 +29,9 @@ ${PROJECT_ROOT}/.opencode/
 .pytest_cache/
 htmlcov/
 .coverage*
+.ruff_cache/
+
+# SQLite history database
+lineart_history.db
+lineart_history.db-shm
+lineart_history.db-wal

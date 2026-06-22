@@ -4,6 +4,8 @@
 {%- set t = i18n.templates.hair_breakdown -%}
 ###BASE###
 {{ char.base_style[lang] }}
+###GENDER###
+{{ i18n.gender["tag_" + char.gender.en] }}
 ###HAIR_STYLE###
 {{ c.hair.style[lang] }}
 ###ACCESSORIES###

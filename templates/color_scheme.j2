@@ -4,6 +4,8 @@
 {%- set t = i18n.templates.color_scheme -%}
 ###BASE###
 {{ char.base_style[lang] }}
+###GENDER###
+{{ i18n.gender["tag_" + char.gender.en] }}
 ###HAIR###
 {{ c.hair.style[lang] }}
 {{ t.hair_color }}

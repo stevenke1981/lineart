@@ -1,0 +1,104 @@
+character:
+  id: sci_fi_mercenary
+  gender:
+    zh: 男
+    en: male
+  label:
+    zh: 科幻傭兵
+    en: Sci-Fi Mercenary
+
+  base_style:
+    zh: "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條"
+    en: "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines"
+
+  components:
+    face:
+      shape:
+        zh: 方正剛毅臉
+        en: square solid face
+      eyes:
+        zh: 冷酷電子義眼
+        en: cold cybernetic eye
+
+    expression:
+      type:
+        zh: 面無表情
+        en: expressionless
+      mouth:
+        zh: 閉唇通訊器
+        en: closed lips with comms
+
+    pose:
+      head_angle:
+        zh: 正面直視
+        en: facing forward
+      action:
+        zh: 持槍警戒
+        en: holding rifle on alert
+
+    hair:
+      style:
+        zh: 陸軍平頭
+        en: military buzz cut
+      accessories:
+        - zh: 戰術目鏡
+          en: tactical goggles
+        - zh: 機械義肢手臂
+          en: cybernetic arm
+
+    clothing:
+      robe:
+        zh: 戰術防彈背心
+        en: tactical ballistic vest
+      collar:
+        zh: 高領戰術衣
+        en: high-collar tactical shirt
+      waist:
+        zh: 多功能戰術腰帶
+        en: multi-purpose tactical belt
+
+  outputs:
+    three_view:
+      label:
+        zh: 人物三視圖
+        en: character three-view sheet
+      style:
+        zh: 動畫原畫設定書風格，科幻軍事設計
+        en: animation keyframe setting book style, sci-fi military design
+    expressions:
+      label:
+        zh: 表情演變五連圖
+        en: five-panel expression evolution sheet
+      style:
+        zh: 動畫原畫設定書風格
+        en: animation keyframe setting book style
+      variants:
+        - id: calm
+          zh: 冷靜
+          en: calm
+        - id: scanning
+          zh: 掃描
+          en: scanning
+        - id: commanding
+          zh: 指揮
+          en: commanding
+        - id: injured
+          zh: 負傷
+          en: injured
+        - id: victorious
+          zh: 勝利
+          en: victorious
+    clothing_breakdown:
+      label:
+        zh: 裝備拆解圖
+        en: equipment breakdown diagram
+      style:
+        zh: 戰術裝備拆解圖，軍事科技細節展示
+        en: tactical equipment breakdown, military tech detail showcase
+    weapon_prop:
+      label:
+        zh: 武器拆解圖
+        en: weapon breakdown diagram
+      style:
+        zh: 科幻槍械設計拆解圖
+        en: sci-fi firearm design breakdown

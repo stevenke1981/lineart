@@ -4,6 +4,8 @@
 {%- set t = i18n.templates.weapon_prop -%}
 ###BASE###
 {{ char.base_style[lang] }}
+###GENDER###
+{{ i18n.gender["tag_" + char.gender.en] }}
 ###CHARACTER_CARRYING###
 {{ c.clothing.robe[lang] }}，{{ c.pose.action[lang] }}
 ###PROP_MAIN###

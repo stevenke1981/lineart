@@ -1,5 +1,9 @@
 character:
   id: magical_girl
+  gender:
+    zh: 女
+    en: female
+
   label:
     zh: 魔法少女
     en: Magical Girl

@@ -1,5 +1,9 @@
 character:
   id: meiji_schoolgirl
+  gender:
+    zh: 女
+    en: female
+
   label:
     zh: 明治女學生
     en: Meiji Schoolgirl

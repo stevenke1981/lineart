@@ -59,6 +59,13 @@ class TestLoadCharacter:
         with pytest.raises(CharacterNotFoundError):
             load_character("nonexistent_char_xyz")
 
+    def test_all_characters_have_gender(self):
+        for cid in list_characters():
+            char = load_character(cid)
+            assert "gender" in char, f"Character '{cid}' missing gender"
+            assert "zh" in char["gender"]
+            assert "en" in char["gender"]
+
 
 class TestListTemplates:
     """Tests for list_templates()."""
@@ -142,6 +149,11 @@ class TestGeneratePrompt:
         assert isinstance(prompt, str)
         assert len(prompt) > 0
 
+    def test_sd_prompt_includes_gender(self):
+        prompt = generate_prompt("three_view", model="sd", char_id="sword_maiden", lang="en")
+        # SD adapter should include female gender tag
+        assert "female" in prompt.lower() or "girl" in prompt.lower()
+
 
 class TestBuildCustomCharacter:
     """Tests for build_custom_character()."""
@@ -179,6 +191,17 @@ class TestBuildCustomCharacter:
         assert acc[0]["en"] == "flower"
         assert acc[1]["zh"] == "蝴蝶"
         assert acc[1]["en"] == "butterfly"
+
+    def test_custom_gender_defaults_to_neutral(self):
+        char = build_custom_character({})
+        assert char["gender"]["zh"] == "中性"
+        assert char["gender"]["en"] == "neutral"
+
+    def test_custom_gender_override(self):
+        form = {"gender": "男", "gender_en": "male"}
+        char = build_custom_character(form)
+        assert char["gender"]["zh"] == "男"
+        assert char["gender"]["en"] == "male"
 
 
 class TestCharacterSchema:

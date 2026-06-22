@@ -3,6 +3,8 @@
 {%- set o = char.outputs.clothing_breakdown -%}
 ###BASE###
 {{ char.base_style[lang] }}
+###GENDER###
+{{ i18n.gender["tag_" + char.gender.en] }}
 ###OUTER_ROBE###
 {{ c.clothing.robe[lang] }}
 ###COLLAR###

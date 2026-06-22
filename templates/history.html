@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lineart — 歷史記錄</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.3"></script>
+  <style>
+    .history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .history-table th, .history-table td { padding: 0.5rem 0.6rem; text-align: left; border-bottom: 1px solid #eee; }
+    .history-table th { background: #f5f5f5; font-weight: 600; color: #555; position: sticky; top: 0; }
+    .history-table tr:hover { background: #f0eeff; }
+    .history-table tr.htmx-swapping { opacity: 0; transition: opacity 0.3s; }
+    .prompt-preview { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #888; }
+    .filters { display: flex; gap: 0.75rem; align-items: flex-end; flex-wrap: wrap; margin-bottom: 1rem; }
+    .filters .field { margin-bottom: 0; }
+    .pagination { display: flex; gap: 0.3rem; align-items: center; margin-top: 1rem; flex-wrap: wrap; }
+    .page-btn { padding: 0.3rem 0.6rem; border: 1px solid #ddd; border-radius: 4px; background: #fff; cursor: pointer; font-size: 0.8rem; }
+    .page-btn.active { background: #6c63ff; color: #fff; border-color: #6c63ff; }
+    .page-btn:hover:not(.active) { background: #f0eeff; }
+    .actions { display: flex; gap: 0.4rem; }
+    .btn-sm { padding: 0.25rem 0.5rem; border: 1px solid #ddd; border-radius: 4px; background: #fff; cursor: pointer; font-size: 0.75rem; }
+    .btn-sm.danger { color: #e74c3c; border-color: #e74c3c; }
+    .btn-sm.danger:hover { background: #fef2f2; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .modal-content { background: #fff; border-radius: 12px; padding: 1.5rem; max-width: 700px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-content textarea { width: 100%; min-height: 150px; font-family: monospace; font-size: 0.8rem; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+    .empty-state { text-align: center; padding: 3rem 1rem; color: #999; }
+  </style>
+</head>
+<body>
+  <div class="container"
+       x-data="{
+         items: [],
+         total: 0,
+         page: 1,
+         pages: 1,
+         perPage: 20,
+         model: '',
+         outputType: '',
+         selectedPrompt: null,
+         showModal: false,
+         loadPage(p) {
+           this.page = p;
+           const params = new URLSearchParams({ page: p, per_page: this.perPage });
+           if (this.model) params.set('model', this.model);
+           if (this.outputType) params.set('output_type', this.outputType);
+           fetch('/history/data?' + params.toString())
+             .then(r => r.json())
+             .then(d => { this.items = d.items; this.total = d.total; this.pages = d.pages; });
+         },
+         viewPrompt(id) {
+           const item = this.items.find(i => i.id === id);
+           if (item) { this.selectedPrompt = item; this.showModal = true; }
+         },
+         deletePrompt(id) {
+           fetch('/history/' + id, { method: 'DELETE' })
+             .then(() => this.loadPage(this.page));
+         },
+         clearAll() {
+           if (!confirm('確定要清空所有歷史記錄？')) return;
+           fetch('/history/clear', { method: 'POST' })
+             .then(() => this.loadPage(1));
+         },
+         escapeHtml(s) {
+           if (!s) return '';
+           return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,' ');
+         },
+         truncate(s, n) {
+           if (!s) return '';
+           return s.length > n ? s.substring(0, n) + '...' : s;
+         }
+       }"
+       x-init="loadPage(1)">
+
+    <header>
+      <h1>歷史記錄</h1>
+      <p class="subtitle">已產生的提示詞歷史</p>
+      <nav style="margin-top:0.5rem;">
+        <a href="/">回到產生器</a>
+      </nav>
+    </header>
+
+    <div class="card">
+      <div class="toolbar">
+        <div class="filters">
+          <div class="field" style="margin:0;">
+            <label>模型</label>
+            <select x-model="model" @change="loadPage(1)">
+              <option value="">全部模型</option>
+              {% for m in models %}
+              <option value="{{ m.key }}">{{ m.label_zh }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field" style="margin:0;">
+            <label>輸出類型</label>
+            <select x-model="outputType" @change="loadPage(1)">
+              <option value="">全部類型</option>
+              {% for t in templates %}
+              <option value="{{ t.key }}">{{ t.zh }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.4rem;">
+          <a href="/history/export?format=json" class="btn-generate" style="padding:0.35rem 0.7rem;font-size:0.8rem;width:auto;">匯出 JSON</a>
+          <a href="/history/export?format=csv" class="btn-generate" style="padding:0.35rem 0.7rem;font-size:0.8rem;width:auto;background:#5a52d5;">匯出 CSV</a>
+          <button class="btn-generate" style="padding:0.35rem 0.7rem;font-size:0.8rem;width:auto;background:#e74c3c;" @click="clearAll()">
+            清空全部
+          </button>
+        </div>
+      </div>
+
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>時間</th>
+            <th>角色</th>
+            <th>模型</th>
+            <th>輸出類型</th>
+            <th>提示詞預覽</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="item in items" :key="item.id">
+            <tr>
+              <td x-text="item.created_at || ''"></td>
+              <td x-text="item.char_label || item.character || '-'"></td>
+              <td x-text="item.model || ''"></td>
+              <td x-text="item.output_type || ''"></td>
+              <td class="prompt-preview" x-text="truncate(escapeHtml(item.prompt), 50)"></td>
+              <td class="actions">
+                <button class="btn-sm" @click="viewPrompt(item.id)">👁</button>
+                <button class="btn-sm danger" @click="deletePrompt(item.id)">🗑</button>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+
+      <div x-show="items.length === 0" class="empty-state">
+        <p>尚無歷史記錄</p>
+      </div>
+
+      <div class="pagination" x-show="pages > 1">
+        <template x-for="p in pages" :key="p">
+          <button class="page-btn"
+                  :class="{ active: page === p }"
+                  x-text="p"
+                  @click="loadPage(p)"></button>
+        </template>
+        <span style="font-size:0.8rem;color:#888;margin-left:0.5rem;">
+         共 <span x-text="total"></span> 筆
+        </span>
+      </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal-overlay" x-show="showModal" x-cloak @click.self="showModal = false">
+      <div class="modal-content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+          <h2 x-text="(selectedPrompt && selectedPrompt.output_type) || ''"></h2>
+          <button @click="showModal = false" style="border:none;background:none;font-size:1.5rem;cursor:pointer;">×</button>
+        </div>
+        <div style="margin-bottom:0.5rem;font-size:0.8rem;color:#888;">
+          <span x-text="'角色: ' + ((selectedPrompt && (selectedPrompt.char_label || selectedPrompt.character)) || '')"></span>
+          <span style="margin:0 0.5rem;">|</span>
+          <span x-text="'模型: ' + ((selectedPrompt && selectedPrompt.model) || '')"></span>
+          <span style="margin:0 0.5rem;">|</span>
+          <span x-text="'時間: ' + ((selectedPrompt && selectedPrompt.created_at) || '')"></span>
+        </div>
+        <textarea readonly x-text="(selectedPrompt && selectedPrompt.prompt) || ''"></textarea>
+        <button class="btn-generate" style="margin-top:0.5rem;padding:0.4rem;font-size:0.85rem;"
+                @click="navigator.clipboard.writeText(selectedPrompt ? selectedPrompt.prompt : '')">📋 複製</button>
+      </div>
+    </div>
+  </div>
+
+  <style>[x-cloak] { display: none !important; }</style>
+</body>
+</html>

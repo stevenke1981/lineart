@@ -1,0 +1,104 @@
+character:
+  id: rock_musician
+  gender:
+    zh: 男
+    en: male
+  label:
+    zh: 搖滾樂手
+    en: Rock Musician
+
+  base_style:
+    zh: "動漫角色設定稿，黑白墨線，乾淨線稿，白底，超精細線條"
+    en: "anime character design sheet, black and white ink, clean lineart, white background, ultra-fine lines"
+
+  components:
+    face:
+      shape:
+        zh: 削瘦臉型
+        en: lean sharp face
+      eyes:
+        zh: 深邃電眼
+        en: deep charismatic eyes
+
+    expression:
+      type:
+        zh: 叛逆
+        en: rebellious
+      mouth:
+        zh: 張口歌唱
+        en: mouth open singing
+
+    pose:
+      head_angle:
+        zh: 45度仰頭
+        en: 45 degree head tilt up
+      action:
+        zh: 抱電吉他站立
+        en: standing holding electric guitar
+
+    hair:
+      style:
+        zh: 刺蝟頭長鬢角
+        en: spiky hair with long sideburns
+      accessories:
+        - zh: 十字架耳環
+          en: cross earring
+        - zh: 頸鍊
+          en: choker necklace
+
+    clothing:
+      robe:
+        zh: 铆釘皮夾克
+        en: studded leather jacket
+      collar:
+        zh: V領內搭
+        en: V-neck undershirt
+      waist:
+        zh: 鉚釘皮帶
+        en: studded belt
+
+  outputs:
+    three_view:
+      label:
+        zh: 人物三視圖
+        en: character three-view sheet
+      style:
+        zh: 動畫原畫設定書風格，搖滾音樂設計
+        en: animation keyframe setting book style, rock music design
+    expressions:
+      label:
+        zh: 表情演變五連圖
+        en: five-panel expression evolution sheet
+      style:
+        zh: 動畫原畫設定書風格
+        en: animation keyframe setting book style
+      variants:
+        - id: rocking
+          zh: 狂野
+          en: wild
+        - id: cool
+          zh: 耍酷
+          en: cool
+        - id: concentrated
+          zh: 專注
+          en: concentrated
+        - id: smiling
+          zh: 燦笑
+          en: bright smile
+        - id: exhausted
+          zh: 虛脫
+          en: exhausted
+    clothing_breakdown:
+      label:
+        zh: 服裝拆解圖
+        en: clothing breakdown diagram
+      style:
+        zh: 搖滾服裝拆解圖，鉚釘皮革細節展示
+        en: rock clothing breakdown, studded leather detail showcase
+    hair_breakdown:
+      label:
+        zh: 髮型飾品拆解圖
+        en: hairstyle accessory breakdown diagram
+      style:
+        zh: 搖滾髮型飾品細節拆解圖
+        en: rock hairstyle accessory detail breakdown
