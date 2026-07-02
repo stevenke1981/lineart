@@ -6,12 +6,14 @@ from pydantic import ValidationError
 from engine import (
     build_custom_character,
     generate_prompt,
+    get_template_labels,
     list_characters,
     list_outputs,
     list_templates,
     load_character,
+    validate_character,
 )
-from exceptions import CharacterNotFoundError, TemplateNotFoundError
+from exceptions import CharacterNotFoundError, CharacterValidationError, TemplateNotFoundError
 
 
 class TestListCharacters:
@@ -203,15 +205,56 @@ class TestBuildCustomCharacter:
         assert char["gender"]["zh"] == "男"
         assert char["gender"]["en"] == "male"
 
+    def test_build_validates_schema(self):
+        from schemas import Character
+
+        char = build_custom_character({})
+        validated = Character(**char)
+        assert validated.id == "custom"
+
+
+class TestValidateCharacter:
+    """Tests for validate_character()."""
+
+    def test_valid_character_returns_model(self):
+        from schemas import Character
+
+        char_data = load_character("sword_maiden")
+        validated = validate_character(char_data)
+        assert isinstance(validated, Character)
+        assert validated.id == "sword_maiden"
+
+    def test_invalid_character_raises(self):
+        with pytest.raises(CharacterValidationError):
+            validate_character({"id": 123})
+
+    def test_load_character_rejects_invalid_schema(self):
+        invalid = load_character("sword_maiden").copy()
+        invalid.pop("base_style")
+        with pytest.raises(CharacterValidationError):
+            validate_character(invalid)
+
+
+class TestGetTemplateLabels:
+    """Tests for get_template_labels()."""
+
+    def test_zh_labels_include_three_view(self):
+        labels = get_template_labels("zh")
+        assert labels["three_view"] == "人物三視圖"
+
+    def test_en_labels_include_three_view(self):
+        labels = get_template_labels("en")
+        assert labels["three_view"] == "Three-view Sheet"
+
 
 class TestCharacterSchema:
     """Tests for Pydantic character schema validation."""
 
     def test_sword_maiden_validates(self):
-        from schemas import BilingualField, Character, CharacterOutput
+        from schemas import BilingualField, CharacterOutput
 
         char_data = load_character("sword_maiden")
-        char = Character(**char_data)
+        char = validate_character(char_data)
         assert char.id == "sword_maiden"
         assert isinstance(char.label, BilingualField)
         assert "three_view" in char.outputs

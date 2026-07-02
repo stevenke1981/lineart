@@ -1,6 +1,8 @@
 from exceptions import ModelNotSupportedError
 
 from .base import BaseAdapter
+from .comfyui import ComfyUIAdapter
+from .dalle import DalleAdapter
 from .midjourney import MidjourneyAdapter
 from .novelai import NovelAIAdapter
 from .stable_diffusion import StableDiffusionAdapter
@@ -12,6 +14,11 @@ ADAPTERS = {
     "midjourney": MidjourneyAdapter,
     "nai": NovelAIAdapter,
     "novelai": NovelAIAdapter,
+    "dalle": DalleAdapter,
+    "dall-e": DalleAdapter,
+    "dall_e": DalleAdapter,
+    "comfyui": ComfyUIAdapter,
+    "comfy": ComfyUIAdapter,
 }
 
 

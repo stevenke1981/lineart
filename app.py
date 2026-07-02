@@ -17,11 +17,13 @@ from engine import (
     build_custom_character,
     generate_prompt,
     generate_prompts,
+    get_template_labels,
     list_characters,
     list_outputs,
     list_templates,
     load_character,
 )
+from exceptions import CharacterNotFoundError, LineartError
 from history import (
     clear_history,
     delete_prompt,
@@ -49,6 +51,8 @@ MODELS = [
     {"key": "sd", "label_zh": "Stable Diffusion", "label_en": "Stable Diffusion"},
     {"key": "mj", "label_zh": "MidJourney", "label_en": "MidJourney"},
     {"key": "nai", "label_zh": "NovelAI", "label_en": "NovelAI"},
+    {"key": "dalle", "label_zh": "DALL·E 3", "label_en": "DALL·E 3"},
+    {"key": "comfyui", "label_zh": "ComfyUI", "label_en": "ComfyUI"},
 ]
 
 LANGS = [
@@ -69,18 +73,6 @@ _GENDER_MAP = {
     "neutral": {"zh": "中性", "en": "neutral"},
     "genderless": {"zh": "無性別", "en": "genderless"},
 }
-
-TEMPLATE_NAMES = {
-    "three_view": ("人物三視圖", "Three-view Sheet"),
-    "expressions": ("表情演變五連圖", "Expression Evolution"),
-    "clothing_breakdown": ("服裝拆解圖", "Clothing Breakdown"),
-    "hair_breakdown": ("髮飾拆解圖", "Hair Accessory Breakdown"),
-    "action_pose": ("動態姿勢集", "Action Poses"),
-    "chibi_version": ("Q版化", "Chibi Version"),
-    "color_scheme": ("配色方案", "Color Scheme"),
-    "weapon_prop": ("武器道具拆解", "Weapon/Prop Breakdown"),
-}
-
 
 # ── Metadata Helpers ───────────────────────────────────────────────
 
@@ -113,10 +105,15 @@ def get_characters_meta() -> list[dict]:
 
 def get_all_templates_meta() -> list[dict]:
     """Return list of {key, zh, en} for all templates."""
-    tmpls = list_templates()
+    zh_labels = get_template_labels("zh")
+    en_labels = get_template_labels("en")
     return [
-        {"key": t, "zh": TEMPLATE_NAMES.get(t, (t, t))[0], "en": TEMPLATE_NAMES.get(t, (t, t))[1]}
-        for t in tmpls
+        {
+            "key": t,
+            "zh": zh_labels.get(t, t),
+            "en": en_labels.get(t, t),
+        }
+        for t in list_templates()
     ]
 
 
@@ -141,43 +138,25 @@ def _build_char_data_from_form(form: dict) -> dict | None:
 
 def _render_result_cards(results: dict[str, str], lang: str = "zh") -> str:
     """Render result HTML fragments for HTMX swap."""
-    parts: list[str] = []
-    for output_type, prompt in results.items():
-        zh, en = TEMPLATE_NAMES.get(output_type, (output_type, output_type))
-        label = zh if lang == "zh" else en
-        escaped_prompt = prompt.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
-        rows = max(4, prompt.count("\n") + 2)
-        copy_zh = "✅ 已複製" if lang == "zh" else "✅ Copied"
-        copy_btn = "📋 複製" if lang == "zh" else "📋 Copy"
-        parts.append(
-            '<div class="card result-card">'
-            '<div class="result-header">'
-            f"<h2>{label}</h2>"
-            "<button class=\"btn-copy\""
-            ' x-data="{ copied: false }"'
-            f" @click=\"navigator.clipboard.writeText(`{escaped_prompt}`)"
-            ".then(() => { copied = true; setTimeout(() => copied = false, 2000) })"
-            ".catch(() => {"
-            " const ta = document.createElement('textarea');"
-            f" ta.value = `{escaped_prompt}`;"
-            " document.body.appendChild(ta); ta.select();"
-            " document.execCommand('copy'); document.body.removeChild(ta);"
-            " copied = true; setTimeout(() => copied = false, 2000) })\""
-            f' x-text="copied ? \'{copy_zh}\' : \'{copy_btn}\'"'
-            ">"
-            f"{copy_btn}"
-            "</button>"
-            "</div>"
-            f'<textarea class="prompt-output" readonly rows="{rows}">'
-            f"{prompt}</textarea>"
-            "</div>"
-        )
-    return "\n".join(parts)
+    labels = get_template_labels(lang)
+    copy_btn = "📋 複製" if lang == "zh" else "📋 Copy"
+    copy_done = "✅ 已複製" if lang == "zh" else "✅ Copied"
+    cards = [
+        {
+            "label": labels.get(output_type, output_type),
+            "prompt": prompt,
+            "rows": max(4, prompt.count("\n") + 2),
+            "copy_btn": copy_btn,
+            "copy_done": copy_done,
+        }
+        for output_type, prompt in results.items()
+    ]
+    return render_template("_result_cards.html", cards=cards)
 
 
 def _render_error(message: str) -> str:
     """Render error HTML fragment for HTMX swap."""
-    return f"""<div class="card error-card"><p>{message}</p></div>"""
+    return render_template("_error.html", message=message)
 
 
 # ── Main Routes ────────────────────────────────────────────────────
@@ -258,6 +237,11 @@ def generate() -> str | Response | tuple[str | Response, int]:
 
         return jsonify({"results": results})
 
+    except LineartError as e:
+        msg = str(e)
+        if is_htmx:
+            return _render_error(msg), 400
+        return jsonify({"error": msg}), 400
     except Exception as e:
         logger.error("Generation failed", exc_info=True)
         msg = str(e)
@@ -293,10 +277,10 @@ def api_outputs(char_id: str) -> Response | tuple[Response, int]:
             else:
                 result.append({"key": k, "zh": k, "en": k})
         return jsonify(result)
-    except FileNotFoundError:
+    except CharacterNotFoundError:
         return jsonify({"error": f"Character '{char_id}' not found"}), 404
-    except Exception:
-        return jsonify({"error": f"Error loading character '{char_id}'"}), 400
+    except LineartError as e:
+        return jsonify({"error": str(e)}), 400
 
 
 # ── History Routes ─────────────────────────────────────────────────

@@ -1,4 +1,14 @@
 # 中文詞典
+output_types:
+  three_view: 人物三視圖
+  expressions: 表情演變五連圖
+  clothing_breakdown: 服裝拆解圖
+  hair_breakdown: 髮飾拆解圖
+  action_pose: 動態姿勢集
+  chibi_version: Q版化
+  color_scheme: 配色方案
+  weapon_prop: 武器道具拆解
+
 terms:
   lineart: 線稿
   black_white: 黑白墨色

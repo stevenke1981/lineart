@@ -3,6 +3,8 @@
 import pytest
 
 from adapters import get_adapter
+from adapters.comfyui import ComfyUIAdapter
+from adapters.dalle import DalleAdapter
 from adapters.midjourney import MidjourneyAdapter
 from adapters.novelai import NovelAIAdapter
 from adapters.stable_diffusion import StableDiffusionAdapter
@@ -43,6 +45,14 @@ class TestGetAdapter:
     def test_case_insensitive(self):
         assert isinstance(get_adapter("SD"), StableDiffusionAdapter)
         assert isinstance(get_adapter("MJ"), MidjourneyAdapter)
+
+    def test_returns_dalle_adapter(self):
+        assert isinstance(get_adapter("dalle"), DalleAdapter)
+        assert isinstance(get_adapter("dall-e"), DalleAdapter)
+
+    def test_returns_comfyui_adapter(self):
+        assert isinstance(get_adapter("comfyui"), ComfyUIAdapter)
+        assert isinstance(get_adapter("comfy"), ComfyUIAdapter)
 
 
 class TestBaseAdapterParseBlocks:
@@ -186,6 +196,42 @@ class TestMidjourneyAdapter:
         result = adapter.format(SAMPLE_INTERMEDIATE)
         # Should be sentence-like, not comma-separated tag soup
         assert ". " in result or "Presented as" in result
+
+
+class TestDalleAdapter:
+    """Tests for DalleAdapter."""
+
+    def test_format_natural_language(self):
+        adapter = DalleAdapter()
+        result = adapter.format(SAMPLE_INTERMEDIATE, lang="en")
+        assert isinstance(result, str)
+        assert len(result) > 0
+        assert "final image" in result.lower()
+
+    def test_format_with_ar(self):
+        adapter = DalleAdapter()
+        result = adapter.format(SAMPLE_INTERMEDIATE, ar="16:9")
+        assert "Aspect ratio: 16:9" in result
+
+
+class TestComfyUIAdapter:
+    """Tests for ComfyUIAdapter."""
+
+    def test_format_returns_json(self):
+        adapter = ComfyUIAdapter()
+        result = adapter.format(SAMPLE_INTERMEDIATE)
+        import json
+
+        data = json.loads(result)
+        assert "nodes" in data
+        assert "clip_positive" in data["nodes"]
+        assert "clip_negative" in data["nodes"]
+        assert "empty_latent" in data["nodes"]
+
+    def test_format_includes_positive_prompt(self):
+        adapter = ComfyUIAdapter()
+        result = adapter.format(SAMPLE_INTERMEDIATE)
+        assert "anime character sheet" in result
 
 
 class TestNovelAIAdapter:

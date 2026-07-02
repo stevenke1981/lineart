@@ -19,3 +19,7 @@ class ModelNotSupportedError(LineartError, ValueError):
 
 class LanguageNotFoundError(LineartError, FileNotFoundError):
     """Raised when an i18n language file is not found."""
+
+
+class CharacterValidationError(LineartError, ValueError):
+    """Raised when a character definition fails schema validation."""

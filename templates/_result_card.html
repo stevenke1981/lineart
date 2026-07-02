@@ -1,0 +1,12 @@
+<div class="card result-card">
+  <div class="result-header">
+    <h2>{{ label }}</h2>
+    <button class="btn-copy"
+            x-data="{ copied: false }"
+            @click="navigator.clipboard.writeText($refs.prompt.value).then(() => { copied = true; setTimeout(() => copied = false, 2000) }).catch(() => { $refs.prompt.select(); document.execCommand('copy'); copied = true; setTimeout(() => copied = false, 2000) })"
+            x-text="copied ? '{{ copy_done }}' : '{{ copy_btn }}'">
+      {{ copy_btn }}
+    </button>
+  </div>
+  <textarea class="prompt-output" readonly rows="{{ rows }}" x-ref="prompt">{{ prompt }}</textarea>
+</div>

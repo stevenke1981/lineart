@@ -7,9 +7,16 @@ from pathlib import Path
 
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from pydantic import ValidationError
 
 from adapters import get_adapter
-from exceptions import CharacterNotFoundError, LanguageNotFoundError, TemplateNotFoundError
+from exceptions import (
+    CharacterNotFoundError,
+    CharacterValidationError,
+    LanguageNotFoundError,
+    TemplateNotFoundError,
+)
+from schemas import Character
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +35,21 @@ def load_i18n(lang: str = "zh") -> dict:
         raise LanguageNotFoundError(f"Language file not found: {filepath}")
     with open(filepath, encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
+
+
+def get_template_labels(lang: str = "zh") -> dict[str, str]:
+    """Return output-type display labels for a language."""
+    i18n = load_i18n(lang)
+    return i18n.get("output_types", {})
+
+
+def validate_character(char_data: dict) -> Character:
+    """Validate a character dict against the Pydantic schema."""
+    try:
+        return Character(**char_data)
+    except ValidationError as exc:
+        char_id = char_data.get("id", "unknown")
+        raise CharacterValidationError(f"Invalid character '{char_id}': {exc}") from exc
 
 
 # ── Characters ─────────────────────────────────────────────────────────
@@ -50,6 +72,7 @@ def load_character(char_id: str) -> dict:
         char_data = yaml.safe_load(f)["character"]
     if "gender" not in char_data:
         char_data["gender"] = {"zh": "中性", "en": "neutral"}
+    validate_character(char_data)
     logger.info("Loaded character '%s'", char_id)
     return char_data
 
@@ -226,7 +249,9 @@ def build_custom_character(form: dict[str, str], lang: str = "zh") -> dict:
 
     Every field has a bilingual default — empty form input falls back to it.
     """
-    return _CharacterForm.from_form_dict(form).to_character_dict()
+    char_data = _CharacterForm.from_form_dict(form).to_character_dict()
+    validate_character(char_data)
+    return char_data
 
 
 def _split_acc(zh_text: str, en_text: str) -> list[dict]:

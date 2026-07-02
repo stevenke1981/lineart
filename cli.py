@@ -4,6 +4,7 @@ import argparse
 import logging
 import sys
 
+from batch import load_batch_file, run_batch
 from engine import (
     build_custom_character,
     generate_prompt,
@@ -25,6 +26,19 @@ from history import (
 
 logger = logging.getLogger(__name__)
 AR_PRESETS: list[str] = ["3:4", "1:1", "4:3", "16:9", "9:16", "21:9", "9:21"]
+MODEL_CHOICES: list[str] = [
+    "sd",
+    "stable_diffusion",
+    "mj",
+    "midjourney",
+    "nai",
+    "novelai",
+    "dalle",
+    "dall-e",
+    "dall_e",
+    "comfyui",
+    "comfy",
+]
 
 
 def _build_arg_parser() -> argparse.ArgumentParser:
@@ -48,7 +62,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "--model",
         "-m",
         default="sd",
-        choices=["sd", "stable_diffusion", "mj", "midjourney", "nai", "novelai"],
+        choices=MODEL_CHOICES,
         help="Target AI model (default: sd)",
     )
     gen.add_argument(
@@ -86,6 +100,21 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     gen.add_argument("--waist-en", help="Waist (en)")
     gen.add_argument("--gender", help="性別 (男/女/中性/無性別)")
     gen.add_argument("--gender-en", help="Gender (male/female/neutral/genderless)")
+
+    # ── batch ─────────────────────────────────────────────────────────
+    bat: argparse.ArgumentParser = sub.add_parser("batch", help="Batch generate from JSON/CSV")
+    bat.add_argument("file", help="Batch input file (.json or .csv)")
+    bat.add_argument(
+        "--output",
+        "-o",
+        default="",
+        help="Optional output JSON file for results",
+    )
+    bat.add_argument(
+        "--no-save",
+        action="store_true",
+        help="Skip saving results to history",
+    )
 
     # ── list ──────────────────────────────────────────────────────────
     lst: argparse.ArgumentParser = sub.add_parser("list", help="List available resources")
@@ -173,11 +202,8 @@ def _handle_generate(args: argparse.Namespace) -> None:
             sys.exit(1)
         char_data = None
         char_id = args.character
-        try:
-            tmp = load_character(char_id)
-            char_label = tmp.get("label", {}).get("zh", char_id)
-        except Exception:
-            char_label = char_id
+        tmp = load_character(char_id)
+        char_label = tmp.get("label", {}).get("zh", char_id)
 
     if not args.type:
         print("Error: specify --type (e.g. --type three_view,expressions)", file=sys.stderr)
@@ -202,7 +228,7 @@ def _handle_generate(args: argparse.Namespace) -> None:
                 prompt=prompt,
             )
         except Exception:
-            pass
+            logger.warning("Failed to save prompt to history", exc_info=True)
 
     if len(output_types) == 1:
         prompt = generate_prompt(
@@ -229,6 +255,44 @@ def _handle_generate(args: argparse.Namespace) -> None:
             print(f"═══ {ot} ═══")
             print(prompt)
             print()
+
+
+def _handle_batch(args: argparse.Namespace) -> None:
+    """Handle the 'batch' subcommand."""
+    import json
+    from pathlib import Path
+
+    jobs = load_batch_file(args.file)
+    results = run_batch(jobs)
+
+    if not args.no_save:
+        for row in results:
+            try:
+                save_prompt(
+                    mode="prebuilt",
+                    character=row["character"],
+                    char_label=row["char_label"],
+                    gender="",
+                    model=row["model"],
+                    lang=row["lang"],
+                    ar=row["ar"],
+                    output_type=row["output_type"],
+                    prompt=row["prompt"],
+                )
+            except Exception:
+                logger.warning("Failed to save batch result to history", exc_info=True)
+
+    for row in results:
+        print(f"═══ {row['character']} / {row['output_type']} ({row['model']}) ═══")
+        print(row["prompt"])
+        print()
+
+    if args.output:
+        Path(args.output).write_text(
+            json.dumps(results, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        print(f"Results written to {args.output}")
 
 
 def _handle_list(args: argparse.Namespace) -> None:
@@ -265,7 +329,7 @@ def _handle_list(args: argparse.Namespace) -> None:
                 label = "(通用模板)"
             print(f"  • {o}  ({label})")
         print("\nLanguages: zh, en")
-        print("Models: sd, mj, nai")
+        print("Models: sd, mj, nai, dalle, comfyui")
         print(f"Aspect ratios: {', '.join(AR_PRESETS)}")
 
 
@@ -335,6 +399,8 @@ def main() -> None:
     try:
         if args.command == "generate":
             _handle_generate(args)
+        elif args.command == "batch":
+            _handle_batch(args)
         elif args.command == "list":
             _handle_list(args)
         elif args.command == "history":

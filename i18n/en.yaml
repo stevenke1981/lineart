@@ -1,4 +1,14 @@
 # English Dictionary
+output_types:
+  three_view: Three-view Sheet
+  expressions: Expression Evolution
+  clothing_breakdown: Clothing Breakdown
+  hair_breakdown: Hair Accessory Breakdown
+  action_pose: Action Poses
+  chibi_version: Chibi Version
+  color_scheme: Color Scheme
+  weapon_prop: Weapon/Prop Breakdown
+
 terms:
   lineart: lineart
   black_white: black and white ink
